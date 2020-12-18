@@ -1,28 +1,18 @@
-# Config file for automatic testing at travis-ci.com
-
 language: python
 python:
-  - 3.8
-  - 3.7
-  - 3.6
-  - 3.5
-
-# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+- 3.8
+- 3.7
+- 3.6
+- 3.5
 install: pip install -U tox-travis
-
-# Command to run tests, e.g. python setup.py test
 script: tox
-
-# Assuming you have installed the travis-ci CLI tool, after you
-# create the Github repo and add it to Travis, run the
-# following command to finish PyPI deployment setup:
-# $ travis encrypt --add deploy.password
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: mondrian-scwgs
+  username: __token__
   password:
-    secure: PLEASE_REPLACE_ME
+    secure: VO5UaaTLhSvgBLjKWwjaATo1kTGRYhyLL9rEaa8jFe1xZHtF30z8IphqG5yG2aXvZ3QaCTXRvc8R2UvtYqBoScM1yPzOMWUDke1mXE6qa3enhYF8SkD6pqt3zDV8IBCgUkhVIqNR9u4wxB2+bq1WZ1fuP6y3grXHtaCKTLqRiU83o7A7KB57pcWYRELmTExvAirnGTB8NXOeWcPhbtKBy0kPz++ao1l4lkcexfQGYt/SbdNF/0qpwTbbgMRM8TI+CJCNNTjXhd4koBqUTnX1c+XyStXZYIrpv9m69Z3uXI1TrcD22dl7ogJqy/v1StfIdzJMg0nUoPbBK0zVXZx/jsfVoNfJKn6bX7bKRr04JNhuAdPsxIEToDRvU00Ft8HaXJ2sYeLKxCQz5A+JQm+1eg3fW8e6yxOK2X+IdM402jvK6ZEuGLqIINXJhpOFmPYw+jOSiKkH5FXHYSHccTPXittDPSIt9K4NOVWs6RRjxM0/bLgKj8NM1MX3aeT/fp0Fr6f7l1bfaLjRYYoh77mcUV83fgSk4vHKQEi8FrtGWgOyADSgIeYw20jOPXH5q69pYb6pv8NJ7OMhbn5kptsHKOgGL62NE8vL7k3TrMFOlos/Pb3vy6WbN0a/SscQSSnPD0DdvwBpWwldqGq2ULqtJIkuT/2UN7vL19GalmyejfE=
+  secure:
   on:
     tags: true
     repo: mondrian-scwgs/csverve
