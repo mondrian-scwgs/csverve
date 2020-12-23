@@ -18,7 +18,6 @@ requirements = [
     'pytest',
     'sphinx',
     'sphinx_epytext'
-
 ]
 
 setup_requirements = [ ]
@@ -56,6 +55,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/mondrian-scwgs/csverve',
-    version='0.1.2',
+    version="v0.1.4",
     zip_safe=False,
 )
