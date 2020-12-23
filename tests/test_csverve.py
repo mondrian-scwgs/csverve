@@ -210,7 +210,7 @@ class TestConcatCsv(helpers.ConcatHelpers):
 
         assert self._raises_correct_error(csverve.concatenate_csv, [],
                                           concatenated,
-                                          expected_error=csverve.CsvConcatException)
+                                          expected_error=csverve.CsverveConcatException)
 
     def test_concat_csv_input_as_dict(self, tmpdir, n_rows):
         """
@@ -643,7 +643,7 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         assert self._raises_correct_error(csverve.merge_frames, dfs,
                                           how="outter", on=[],
-                                          expected_error=csverve.CsvMergeException)
+                                          expected_error=csverve.CsverveMergeException)
 
     def test_merge_frames_cols_to_merge_have_different_dtypes(self, n_rows):
         """
@@ -657,7 +657,7 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         assert self._raises_correct_error(csverve.merge_frames, dfs,
                                           how="outer", on=[],
-                                          expected_error=csverve.CsvMergeException)
+                                          expected_error=csverve.CsverveMergeException)
 
     def test_merge_frames_no_merge_col_given(self, n_rows):
         """
@@ -671,7 +671,7 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         assert self._raises_correct_error(csverve.merge_frames, dfs,
                                           how="outer", on=[],
-                                          expected_error=csverve.CsvMergeException)
+                                          expected_error=csverve.CsverveMergeException)
 
     def test_merge_frames_with_nans(self, n_rows):
         """
@@ -707,7 +707,7 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         assert self._raises_correct_error(csverve.merge_frames, dfs,
                                           how=how, on=on,
-                                          expected_error=csverve.CsvMergeCommonColException)
+                                          expected_error=csverve.CsverveMergeCommonColException)
 
 
 class TestMergeDtypes(helpers.MergeHelpers):
@@ -730,7 +730,7 @@ class TestMergeDtypes(helpers.MergeHelpers):
         test merging of empty list of dtypes
         """
         assert self._raises_correct_error(csverve.merge_dtypes, [],
-                                          expected_error=csverve.CsvMergeDtypesEmptyMergeSet)
+                                          expected_error=csverve.CsverveMergeDtypesEmptyMergeSet)
 
     def test_merge_dtypes_one_given(self):
         """
