@@ -16,7 +16,7 @@ csverve
 
 
 
-todo: add description
+Csverve, pronounced like "swerve" with a "v", is a package for manipulating tabular data.
 
 
 * Free software: MIT license
@@ -26,7 +26,40 @@ todo: add description
 Features
 --------
 
-* TODO
+* Take in a regular gzipped CSV file and convert it to `csverve` format
+* Merge gzipped CSZ files
+* Concatenate gzipped CSV files (handles large datasets)
+* Rewrite a gzipped CSV file (delete headers etc.)
+* Annotate - add a column based on provided dictionary
+* Write pandas DataFrame to `csverve` CSV
+* Read a `csverve` CSV
+
+Requirements
+------------
+Every gzipped CSV file must be accompanied by a meta YAML file. The meta yaml file must have the exact name as the
+gzipped CSV file, with the addition of a `.yaml` ending.
+
+csv.gz.yaml must contain:
+=========================
+
+* column names
+* dtypes for each column
+* separator
+* header (bool) to specify if file has header or not
+
+Example:
+
+.. code-block:: yaml
+
+   columns:
+    - dtype: int
+      name: prediction_id
+    - dtype: str
+      name: chromosome_1
+    - dtype: str
+      name: strand_1
+    header: true
+    sep: "\t"
 
 Credits
 -------

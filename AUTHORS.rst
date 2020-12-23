@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Shah Lab <audreyr@example.com>
+* Shah Lab <todo@todo.com>
 
 Contributors
 ------------
