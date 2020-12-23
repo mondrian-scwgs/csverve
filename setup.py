@@ -15,7 +15,10 @@ requirements = [
     'pandas',
     'pyyaml',
     'numpy',
-    'pytest'
+    'pytest',
+    'sphinx',
+    'sphinx_epytext'
+
 ]
 
 setup_requirements = [ ]

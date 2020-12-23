@@ -6,9 +6,7 @@ import click
 @click.command()
 def main(args=None):
     """Console script for csverve."""
-    click.echo("Replace this message by putting your code into "
-               "csverve.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
+    click.echo("No commands yet, but open for suggestions :)")
     return 0
 
 

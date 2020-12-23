@@ -6,6 +6,7 @@ __email__ = 'todo@todo.com'
 __version__ = '0.1.0'
 
 
+# csverve methods
 from csverve.csverve import add_col_from_dict
 from csverve.csverve import annotate_csv
 from csverve.csverve import concatenate_csv
@@ -20,5 +21,6 @@ from csverve.csverve import rewrite_csv_file
 from csverve.csverve import write_dataframe_to_csv_and_yaml
 from csverve.csverve import write_metadata
 
+# extras methods
 from csverve.extras import union_categories
 from csverve.extras import concatenate_with_categories

@@ -69,7 +69,7 @@ class TestInputs:
 class TestValidationHelpers:
 
     def _raises_correct_error(self, function, *args,
-                              expected_error=csverve.CsvParseError,
+                              expected_error=csverve.CsverveParseError,
                               **kwargs):
         raised = False
         try:
@@ -86,9 +86,9 @@ class TestValidationHelpers:
     def dfs_exact_match(self, data, reference):
 
         if isinstance(data, str):
-            data = csverve.CsvInput(data).read_csv()
+            data = csverve.CsverveInput(data).read_csv()
         if isinstance(reference, str):
-            reference = csverve.CsvInput(reference).read_csv()
+            reference = csverve.CsverveInput(reference).read_csv()
 
         if set(data.columns) != set(reference.columns):
             return False
@@ -171,7 +171,7 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         :return:
         """
         if isinstance(csv, str):
-            csv = csverve.CsvInput(csv).read_csv()
+            csv = csverve.CsverveInput(csv).read_csv()
 
         annotation_comparable = {on: list(annotation.keys())}
         annotation_as_list = list(annotation.values())
