@@ -16,8 +16,7 @@ requirements = [
     'pyyaml',
     'numpy',
     'pytest',
-    'sphinx',
-    'sphinx_epytext'
+    'Sphinx==1.8.5',
 ]
 
 setup_requirements = [ ]

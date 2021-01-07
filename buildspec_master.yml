@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+  build:
+    commands:
+      - pytest
+  post_build:
+    commands:
+      - if [ $CODEBUILD_BUILD_SUCCEEDING = 1 ]; pip install -r requirements_dev.txt && python setup.py sdist bdist_wheel && twine upload --skip-existing -u __token__ -p $PYPI_TOKEN dist/*; fi
