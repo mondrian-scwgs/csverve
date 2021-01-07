@@ -8,4 +8,4 @@ phases:
       - pip install -r requirements_dev.txt && pytest
   post_build:
     commands:
-      - if [ $CODEBUILD_BUILD_SUCCEEDING = 1 ]; python setup.py sdist bdist_wheel && twine upload --skip-existing -u __token__ -p $PYPI_TOKEN dist/*; fi
+      - if [ $CODEBUILD_BUILD_SUCCEEDING = 1 ]; then python setup.py sdist bdist_wheel && twine upload --skip-existing -u __token__ -p $PYPI_TOKEN dist/*; fi
