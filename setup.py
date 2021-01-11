@@ -12,7 +12,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'click>=7.0',
-    'pandas',
+    'pandas>=1.0.0',
     'pyyaml',
     'numpy',
     'pytest',

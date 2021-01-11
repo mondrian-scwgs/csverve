@@ -1,3 +1,4 @@
+from typing import List, Set, Dict, Tuple, Optional
 from csverve import helpers
 import pandas as pd
 import collections
@@ -456,7 +457,7 @@ class CsverveOutput(object):
         self.write_yaml()
 
 
-def write_metadata(infile, dtypes):
+def write_metadata(infile: str, dtypes: Dict[str, str]) -> None:
     """
     Create meta YAML for a gzipped CSV file. Must include dtypes for all columns.
 
@@ -474,7 +475,7 @@ def write_metadata(infile, dtypes):
     csvoutput.write_yaml()
 
 
-def merge_dtypes(dtypes_all):
+def merge_dtypes(dtypes_all: List[Dict[str, str]]) -> Dict[str, str]:
     """
     Merge pandas dtypes.
 
@@ -498,7 +499,7 @@ def merge_dtypes(dtypes_all):
     return merged_dtypes
 
 
-def concatenate_csv(inputfiles, output, write_header=True):
+def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = True) -> None:
     """
     Concatenate gzipped CSV files, dtypes in meta YAML files must be the same.
 
@@ -537,7 +538,13 @@ def concatenate_csv(inputfiles, output, write_header=True):
         concatenate_csv_files_pandas(inputfiles, output, dtypes, write_header=write_header)
 
 
-def concatenate_csv_files_pandas(in_filenames, out_filename, dtypes, write_header=True):
+def concatenate_csv_files_pandas(
+    in_filenames: List[str],
+    out_filename: str,
+    dtypes: Dict[str, str],
+    write_header: bool = True
+) -> None:
+    #TODO: how do u add multiple type hints?
     """
     Concatenate gzipped CSV files.
 
@@ -559,7 +566,13 @@ def concatenate_csv_files_pandas(in_filenames, out_filename, dtypes, write_heade
     csvoutput.write_df(data)
 
 
-def concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns, write_header=True):
+def concatenate_csv_files_quick_lowmem(
+    inputfiles: List[str],
+    output: str,
+    dtypes: Dict[str, str],
+    columns: List[str],
+    write_header: bool = True
+) -> None:
     """
     Concatenate gzipped CSV files.
 
@@ -578,7 +591,14 @@ def concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns, writ
 
 
 # annotation_dtypes shouldnt be default, if it is None, it breaks
-def annotate_csv(infile, annotation_data, outfile, annotation_dtypes, on="cell_id", write_header=True):
+def annotate_csv(
+    infile,
+    annotation_data,
+    outfile,
+    annotation_dtypes,
+    on="cell_id",
+    write_header: bool = True,
+):
     """
     TODO: fill this in
 
@@ -621,7 +641,13 @@ def annotate_csv(infile, annotation_data, outfile, annotation_dtypes, on="cell_i
     output.write_df(metrics_df)
 
 
-def add_col_from_dict(infile, col_data, outfile, dtypes, write_header=True):
+def add_col_from_dict(
+    infile,
+    col_data,
+    outfile,
+    dtypes,
+    write_header=True
+):
     """
     TODO: fill this in
     Add column to gzipped CSV.
@@ -691,7 +717,7 @@ def rewrite_csv_file(filepath, outputfile, write_header=True, dtypes=None):
         csvoutput.rewrite_csv(filepath)
 
 
-def merge_csv(in_filenames, out_filename, how, on, write_header=True):
+def merge_csv(in_filenames: Dict[str, str], out_filename: str, how: str, on: str, write_header: bool = True):
     """
     Create one gzipped CSV out of multiple gzipped CSVs.
 
@@ -721,7 +747,7 @@ def merge_csv(in_filenames, out_filename, how, on, write_header=True):
     csvoutput.write_df(data)
 
 
-def _validate_merge_cols(frames, on):
+def _validate_merge_cols(frames: List[pd.DataFrame], on: List[str]) -> None:
     """
     Make sure frames look good, raise relevant exceptions.
 
@@ -752,7 +778,7 @@ def _validate_merge_cols(frames, on):
             raise CsverveMergeCommonColException("non-merged common cols must be identical")
 
 
-def merge_frames(frames, how, on):
+def merge_frames(frames: List[pd.DataFrame], how: str, on: str) -> pd.DataFrame:
     """
     Takes in a list of pandas DataFrames, and merges into a single DataFrame.
     #TODO: add handling if empty list is given
@@ -788,7 +814,12 @@ def merge_frames(frames, how, on):
         return merged_frame
 
 
-def write_dataframe_to_csv_and_yaml(df, outfile, dtypes, write_header=True):
+def write_dataframe_to_csv_and_yaml(
+    df: pd.DataFrame,
+    outfile: str,
+    dtypes: Dict[str, str],
+    write_header: bool = True
+) -> None:
     """
     Output pandas dataframe to a CSV and meta YAML files.
 
@@ -802,7 +833,7 @@ def write_dataframe_to_csv_and_yaml(df, outfile, dtypes, write_header=True):
     csvoutput.write_df(df)
 
 
-def read_csv_and_yaml(infile, chunksize=None):
+def read_csv_and_yaml(infile: str, chunksize:int = None) -> pd.DataFrame:
     """
     Read in CSV file and return as a pandas DataFrame.
 
@@ -816,7 +847,8 @@ def read_csv_and_yaml(infile, chunksize=None):
     return CsverveInput(infile).read_csv(chunksize=chunksize)
 
 
-def get_metadata(input):
+def get_metadata(input: str) -> bool:
+    #TODO: how do u specify multiple return with hints?
     """
     Get CSV file's header, dtypes and columns.
 
