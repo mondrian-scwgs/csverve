@@ -4,7 +4,7 @@ import numpy as np
 import collections
 
 
-def union_categories(dfs: List[pd.DataFrame], cat_cols: List[str] = None) -> None:
+def union_categories(dfs: List[pd.DataFrame], cat_cols: Union[Set[str], None] = None) -> None:
     """
     Recreate specified categoricals on the union of categories inplace.
 

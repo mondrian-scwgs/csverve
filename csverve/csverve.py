@@ -1,5 +1,4 @@
-from typing import List, Set, Dict, Tuple, Optional, Union
-from io import TextIOWrapper
+from typing import List, Set, Dict, Tuple, Optional, Union, TextIO, Any, Hashable
 from csverve import helpers
 import pandas as pd
 import collections
@@ -84,7 +83,7 @@ class CsverveTypeMismatch(Exception):
         return message
 
 
-def pandas_to_std_types():
+def pandas_to_std_types() -> Dict[str, str]:
     std_dict = {
         "bool": "bool",
         "int64": "int",
@@ -110,10 +109,14 @@ class IrregularCsverveInput(object):
         @param dtypes: dictionary of pandas dtypes by column, keys = column name, value = dtype.
         @param na_rep: replace NaN with this value.
         """
+        self.header: bool
+        self.sep: str
+        self.dtypes: Dict[str, str]
+        self.columns: List[str]
 
-        self.filepath = filepath
-        self.na_rep = na_rep
-        metadata = self.__generate_metadata()
+        self.filepath: str = filepath
+        self.na_rep: str = na_rep
+        metadata: Tuple[bool, str, Dict[str, str], List[str]] = self.__generate_metadata()
         self.header, self.sep, self.dtypes, self.columns = metadata
         self.dtypes = dtypes
 
@@ -136,10 +139,11 @@ class IrregularCsverveInput(object):
                 .hdf5 -> error, not supported
                 other exts -> None:
         """
-        filepath = self.filepath
+        filepath: str = self.filepath
         if filepath.endswith('.tmp'):
             filepath = filepath[:-4]
 
+        ext: str
         _, ext = os.path.splitext(filepath)
 
         if ext == ".csv":
@@ -161,7 +165,7 @@ class IrregularCsverveInput(object):
         @param df: pandas DataFrame.
         @return: dictionary of pandas dtypes by column, keys = column name, value = dtype.
         """
-        type_converter = pandas_to_std_types()
+        type_converter: Dict[str, str] = pandas_to_std_types()
 
         typeinfo = {}
         for column, dtype in df.dtypes.items():
@@ -193,19 +197,21 @@ class IrregularCsverveInput(object):
             return '\t'
         elif ',' in header:
             return ','
+        else:
+            raise Exception()
 
-    def __generate_metadata(self) -> Union[str, str, Dict[str, str], List[str]]:
+    def __generate_metadata(self) -> Tuple[bool, str, Dict[str, str], List[str]]:
         """
         Get metadata of CSV file.
 
         @return: header, separator, pandas dtypes, columns
         """
         with helpers.getFileHandle(self.filepath, 'rt') as inputfile:
-            header = inputfile.readline().strip()
-            sep = self.__detect_sep_from_header(header)
-            columns = header.split(sep)
-            header = True
-            dtypes = self.__generate_dtypes(sep=sep)
+            header_line: str = inputfile.readline().strip()
+            sep: str = self.__detect_sep_from_header(header_line)
+            columns: List[str] = header_line.split(sep)
+            header: bool = True
+            dtypes: Dict[str, str] = self.__generate_dtypes(sep=sep)
             return header, sep, dtypes, columns
 
     def __generate_dtypes(self, columns: List[str] = None, sep: str = ',') -> Dict[str, str]:
@@ -216,9 +222,9 @@ class IrregularCsverveInput(object):
         @param sep: Separator.
         @return: Dictionary of pandas dtypes by column, keys = column name, value = dtype.
         """
-        compression = self.__get_compression_type_pandas()
+        compression: Union[None, str] = self.__get_compression_type_pandas()
 
-        data = pd.read_csv(
+        data: pd.DataFrame = pd.read_csv(
             self.filepath, compression=compression, chunksize=10 ** 6,
             sep=sep
         )
@@ -227,7 +233,7 @@ class IrregularCsverveInput(object):
         if columns:
             data.columns = columns
 
-        typeinfo = self.get_dtypes_from_df(data)
+        typeinfo: Dict[str, str] = self.get_dtypes_from_df(data)
         return typeinfo
 
     def read_csv(self, chunksize: int = None) -> pd.DataFrame:
@@ -243,15 +249,15 @@ class IrregularCsverveInput(object):
                     assert col in self.dtypes, col
                 yield df
 
-        dtypes = {k: v for k, v in self.dtypes.items() if v != "NA"}
+        dtypes: Dict[str, str] = {k: v for k, v in self.dtypes.items() if v != "NA"}
         # if header exists then use first line (0) as header
         header = 0 if self.header else None
         names = None if self.header else self.columns
 
-        compression = self.__get_compression_type_pandas()
+        compression: Union[None, str] = self.__get_compression_type_pandas()
 
         try:
-            data = pd.read_csv(
+            data: pd.DataFrame = pd.read_csv(
                 self.filepath, compression=compression, chunksize=chunksize,
                 sep=self.sep, header=header, names=names, dtype=dtypes)
         except pd.errors.EmptyDataError:
@@ -273,9 +279,14 @@ class CsverveInput(object):
         @param filepath: Path of CSV.
         @param na_rep: Replace NaN with this value.
         """
-        self.filepath = filepath
-        self.na_rep = na_rep
-        metadata = self.__parse_metadata()
+        self.header: bool
+        self.dtypes: Dict[str, str]
+        self.columns: List[str]
+        self.sep: str
+
+        self.filepath: str = filepath
+        self.na_rep: str = na_rep
+        metadata: Tuple[bool, Dict[str, str], List[str], str] = self.__parse_metadata()
         self.header, self.dtypes, self.columns, self.sep = metadata
         self.__confirm_compression_type_pandas()
 
@@ -307,16 +318,17 @@ class CsverveInput(object):
         @return:
         """
 
-        filepath = self.filepath
+        filepath: str = self.filepath
         if filepath.endswith('.tmp'):
             filepath = filepath[:-4]
 
+        ext: str
         _, ext = os.path.splitext(filepath)
 
         if not ext == ".gz":
             raise CsverveInputError("{} is not supported".format(ext))
 
-    def __parse_metadata(self) -> Union[str, Dict[str, str], List[str], str]:
+    def __parse_metadata(self) -> Tuple[bool, Dict[str, str], List[str], str]:
         """
         Parse metadata.
 
@@ -326,13 +338,13 @@ class CsverveInput(object):
         with open(self.filepath + '.yaml') as yamlfile:
             yamldata = yaml.safe_load(yamlfile)
 
-        header = yamldata['header']
-        sep = yamldata['sep']
+        header: bool = yamldata['header']
+        sep: str = yamldata['sep']
 
-        dtypes = {}
-        columns = []
+        dtypes: Dict[str, str] = {}
+        columns: List[str] = []
         for coldata in yamldata['columns']:
-            colname = coldata['name']
+            colname: str = coldata['name']
 
             dtypes[colname] = coldata['dtype']
 
@@ -363,13 +375,13 @@ class CsverveInput(object):
                 self.__verify_data(df)
                 yield df
 
-        dtypes = {k: v for k, v in self.dtypes.items() if v != "NA"}
+        dtypes: Dict[str, str] = {k: v for k, v in self.dtypes.items() if v != "NA"}
         # if header exists then use first line (0) as header
-        header = 0 if self.header else None
-        names = None if self.header else self.columns
+        header: Union[int, None] = 0 if self.header else None
+        names: Union[None, List[str]] = None if self.header else self.columns
 
         try:
-            data = pd.read_csv(
+            data: pd.DataFrame = pd.read_csv(
                 self.filepath, compression='gzip', chunksize=chunksize,
                 sep=self.sep, header=header, names=names, dtype=dtypes)
         except pd.errors.EmptyDataError:
@@ -402,13 +414,13 @@ class CsverveOutput(object):
         @param columns: List of column names.
         """
 
-        self.filepath = filepath
-        self.header = header
-        self.dtypes = dtypes
-        self.na_rep = na_rep
-        self.columns = columns
+        self.filepath: str = filepath
+        self.header: bool = header
+        self.dtypes: Dict[str, str] = dtypes
+        self.na_rep: str = na_rep
+        self.columns: List[str] = columns
         self.__confirm_compression_type_pandas()
-        self.sep = ','
+        self.sep: str = ','
 
     @property
     def yaml_file(self) -> str:
@@ -436,10 +448,11 @@ class CsverveOutput(object):
         @return:
         """
 
-        filepath = self.filepath
+        filepath: str = self.filepath
         if filepath.endswith('.tmp'):
             filepath = filepath[:-4]
 
+        ext: str
         _, ext = os.path.splitext(filepath)
 
         if not ext == ".gz":
@@ -452,9 +465,9 @@ class CsverveOutput(object):
         @return:
         """
 
-        type_converter = pandas_to_std_types()
+        type_converter: Dict[str, str] = pandas_to_std_types()
 
-        yamldata = {'header': self.header, 'sep': self.sep, 'columns': []}
+        yamldata: Dict[str, Any] = {'header': self.header, 'sep': self.sep, 'columns': []}
         for column in self.columns:
             data = {'name': column, 'dtype': type_converter[self.dtypes[column]]}
             yamldata['columns'].append(data)
@@ -470,8 +483,8 @@ class CsverveOutput(object):
         @return: Dictionary of pandas dtypes, where key = column name, value = dtype.
         """
 
-        dtypes = df.dtypes
-        dtypes_converter = pandas_to_std_types()
+        dtypes: Dict[str, str] = df.dtypes
+        dtypes_converter: Dict[str, str] = pandas_to_std_types()
         dtypes = {k: dtypes_converter[str(v)] for k, v in dtypes.items()}
         return dtypes
 
@@ -497,7 +510,7 @@ class CsverveOutput(object):
         """
 
         for column_name in df.columns.values:
-            dtype = self.dtypes[column_name]
+            dtype: str = self.dtypes[column_name]
 
             if str(dtype) == 'bool' and df[column_name].isnull().any():
                 raise Exception('NaN found in bool column:{}'.format(column_name))
@@ -558,15 +571,15 @@ class CsverveOutput(object):
 
         self.write_yaml()
 
-    def write_header(self, writer: TextIOWrapper) -> None:
+    def write_header(self, writer: TextIO) -> None:
         """
         Write header.
 
-        @param writer: TextIOWrapper.
+        @param writer: TextIO.
         @return:
         """
 
-        header = ','.join(self.columns)
+        header: str = ','.join(self.columns)
         header = header + '\n'
         writer.write(header)
 
@@ -644,9 +657,9 @@ def write_metadata(infile: str, dtypes: Dict[str, str]) -> None:
     @return:
     """
 
-    csvinput = IrregularCsverveInput(infile, dtypes)
+    csvinput: IrregularCsverveInput = IrregularCsverveInput(infile, dtypes)
 
-    csvoutput = CsverveOutput(
+    csvoutput: CsverveOutput = CsverveOutput(
         infile, csvinput.dtypes, header=csvinput.header,
         columns=csvinput.columns
     )
@@ -664,7 +677,7 @@ def merge_dtypes(dtypes_all: List[Dict[str, str]]) -> Dict[str, str]:
     if dtypes_all == []:
         raise CsverveMergeDtypesEmptyMergeSet("must provide dtypes to merge")
 
-    merged_dtypes = {}
+    merged_dtypes: Dict[str, str] = {}
 
     for dtypes in dtypes_all:
         for k, v in dtypes.items():
@@ -693,15 +706,15 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
     if isinstance(inputfiles, dict):
         inputfiles = inputfiles.values()
 
-    inputs = [CsverveInput(infile) for infile in inputfiles]
+    inputs: List[CsverveInput] = [CsverveInput(infile) for infile in inputfiles]
 
-    dtypes = merge_dtypes([csvinput.dtypes for csvinput in inputs])
+    dtypes: Dict[str, str] = merge_dtypes([csvinput.dtypes for csvinput in inputs])
 
-    headers = [csvinput.header for csvinput in inputs]
+    headers: List[bool] = [csvinput.header for csvinput in inputs]
 
-    columns = [csvinput.columns for csvinput in inputs]
+    columns: List[List[str]] = [csvinput.columns for csvinput in inputs]
 
-    low_memory = True
+    low_memory: bool = True
     if any(headers):
         low_memory = False
 
@@ -709,8 +722,8 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
         low_memory = False
 
     if low_memory:
-        columns = columns[0]
-        concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns, write_header=write_header)
+        columns_ = columns[0]
+        concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns_, write_header=write_header)
 
     else:
         concatenate_csv_files_pandas(inputfiles, output, dtypes, write_header=write_header)
@@ -735,12 +748,12 @@ def concatenate_csv_files_pandas(
     if isinstance(in_filenames, dict):
         in_filenames = in_filenames.values()
 
-    data = [
+    data: List[CsverveInput] = [
         CsverveInput(in_filename).read_csv() for in_filename in in_filenames
     ]
-    data = pd.concat(data, ignore_index=True)
-    csvoutput = CsverveOutput(out_filename, dtypes, header=write_header)
-    csvoutput.write_df(data)
+    data_: pd.DataFrame = pd.concat(data, ignore_index=True)
+    csvoutput: CsverveOutput = CsverveOutput(out_filename, dtypes, header=write_header)
+    csvoutput.write_df(data_)
 
 
 def concatenate_csv_files_quick_lowmem(
@@ -761,7 +774,7 @@ def concatenate_csv_files_quick_lowmem(
     @return:
     """
 
-    csvoutput = CsverveOutput(
+    csvoutput: CsverveOutput = CsverveOutput(
         output, dtypes, header=write_header, columns=columns
     )
     csvoutput.write_data_streams(inputfiles)
@@ -911,23 +924,23 @@ def merge_csv(
     if isinstance(in_filenames, dict):
         in_filenames = in_filenames.values()
 
-    data = [CsverveInput(infile) for infile in in_filenames]
+    data: List[CsverveInput] = [CsverveInput(infile) for infile in in_filenames]
 
-    dfs = [csvinput.read_csv() for csvinput in data]
+    dfs: List[str] = [csvinput.read_csv() for csvinput in data]
 
-    dtypes = [csvinput.dtypes for csvinput in data]
+    dtypes: List[Dict[str, str]] = [csvinput.dtypes for csvinput in data]
 
-    data = merge_frames(dfs, how, on)
+    data_: pd.DataFrame = merge_frames(dfs, how, on)
 
-    dtypes = merge_dtypes(dtypes)
+    dtypes_: Dict[str, str] = merge_dtypes(dtypes)
 
-    columns = list(data.columns.values)
+    columns: List[str] = list(data_.columns.values)
 
-    csvoutput = CsverveOutput(out_filename, dtypes, header=write_header, columns=columns)
-    csvoutput.write_df(data)
+    csvoutput: CsverveOutput = CsverveOutput(out_filename, dtypes_, header=write_header, columns=columns)
+    csvoutput.write_df(data_)
 
 
-def _validate_merge_cols(frames: List[pd.DataFrame], on: List[str]) -> None:
+def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str]) -> None:
     """
     Make sure frames look good, raise relevant exceptions.
 
@@ -978,13 +991,13 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: str) -> pd.DataFrame:
         return frames[0]
 
     else:
-        left = frames[0]
-        right = frames[1]
-        cols_to_use = list(right.columns.difference(left.columns))
+        left: pd.DataFrame = frames[0]
+        right: pd.DataFrame = frames[1]
+        cols_to_use: List[str] = list(right.columns.difference(left.columns))
         cols_to_use += on
         cols_to_use = list(set(cols_to_use))
 
-        merged_frame = pd.merge(
+        merged_frame: pd.DataFrame = pd.merge(
             left, right[cols_to_use], how=how, on=on,
         )
         for i, frame in enumerate(frames[2:]):
@@ -1009,7 +1022,7 @@ def write_dataframe_to_csv_and_yaml(
     @param write_header: boolean, True = write header, False = don't write header
     @return:
     """
-    csvoutput = CsverveOutput(outfile, dtypes, header=write_header)
+    csvoutput: CsverveOutput = CsverveOutput(outfile, dtypes, header=write_header)
     csvoutput.write_df(df)
 
 
@@ -1027,7 +1040,7 @@ def read_csv_and_yaml(infile: str, chunksize: int = None) -> pd.DataFrame:
     return CsverveInput(infile).read_csv(chunksize=chunksize)
 
 
-def get_metadata(input: str) -> Union[bool, Dict[str, str], List[List]]:
+def get_metadata(input: str) -> Tuple[bool, Dict[str, str], List[str]]:
     """
     Get CSV file's header, dtypes and columns.
 
@@ -1041,7 +1054,7 @@ def get_metadata(input: str) -> Union[bool, Dict[str, str], List[List]]:
     @param input: Path to CSV file.
     @return: header (bool), dtypes (dict), columns (list).
     """
-    csvinput = CsverveInput(input)
+    csvinput: CsverveInput = CsverveInput(input)
     return csvinput.header, csvinput.dtypes, csvinput.columns
 
 

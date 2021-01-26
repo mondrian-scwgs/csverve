@@ -17,6 +17,7 @@ requirements = [
     'numpy',
     'pytest',
     'Sphinx==1.8.5',
+    'mypy==0.790',
 ]
 
 setup_requirements = [ ]
