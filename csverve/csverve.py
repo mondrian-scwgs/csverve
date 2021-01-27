@@ -1,6 +1,6 @@
 from typing import List, Set, Dict, Tuple, Optional, Union, TextIO, Any, Hashable
 from csverve import helpers
-import pandas as pd
+import pandas as pd # type: ignore
 import collections
 import logging
 import shutil
@@ -418,7 +418,7 @@ class CsverveOutput(object):
         self.header: bool = header
         self.dtypes: Dict[str, str] = dtypes
         self.na_rep: str = na_rep
-        self.columns: List[str] = columns
+        self.columns: Optional[List[str]] = columns
         self.__confirm_compression_type_pandas()
         self.sep: str = ','
 
@@ -438,7 +438,7 @@ class CsverveOutput(object):
 
         @return:
         """
-
+        assert self.columns
         return self.sep.join(self.columns) + '\n'
 
     def __confirm_compression_type_pandas(self) -> None:
@@ -468,6 +468,8 @@ class CsverveOutput(object):
         type_converter: Dict[str, str] = pandas_to_std_types()
 
         yamldata: Dict[str, Any] = {'header': self.header, 'sep': self.sep, 'columns': []}
+
+        assert self.columns
         for column in self.columns:
             data = {'name': column, 'dtype': type_converter[self.dtypes[column]]}
             yamldata['columns'].append(data)
@@ -578,7 +580,7 @@ class CsverveOutput(object):
         @param writer: TextIO.
         @return:
         """
-
+        assert self.columns
         header: str = ','.join(self.columns)
         header = header + '\n'
         writer.write(header)
@@ -746,7 +748,7 @@ def concatenate_csv_files_pandas(
     """
 
     if isinstance(in_filenames, dict):
-        in_filenames = in_filenames.values()
+        in_filenames = list(in_filenames.values())
 
     data: List[CsverveInput] = [
         CsverveInput(in_filename).read_csv() for in_filename in in_filenames
@@ -882,7 +884,7 @@ def rewrite_csv_file(
     """
 
     if os.path.exists(filepath + '.yaml'):
-        csvinput = CsverveInput(filepath)
+        csvinput : Union[CsverveInput, IrregularCsverveInput] = CsverveInput(filepath)
     else:
         assert dtypes
         csvinput = IrregularCsverveInput(filepath, dtypes)
@@ -905,7 +907,7 @@ def rewrite_csv_file(
 
 
 def merge_csv(
-    in_filenames: Dict[str, str],
+    in_filenames: Union[List[str], Dict[str, str]],
     out_filename: str,
     how: str,
     on: str,
@@ -922,7 +924,7 @@ def merge_csv(
     @return:
     """
     if isinstance(in_filenames, dict):
-        in_filenames = in_filenames.values()
+        in_filenames = list(in_filenames.values())
 
     data: List[CsverveInput] = [CsverveInput(infile) for infile in in_filenames]
 
@@ -983,7 +985,9 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: str) -> pd.DataFrame:
     """
 
     if ',' in on:
-        on = on.split(',')
+        on_split = on.split(',')
+    else:
+        on_split = [on]
 
     _validate_merge_cols(frames, on)
 
