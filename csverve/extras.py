@@ -1,9 +1,10 @@
-import pandas as pd
-import numpy as np
+from typing import List, Set, Dict, Tuple, Optional, Union
+import pandas as pd # type: ignore
+import numpy as np # type: ignore
 import collections
 
 
-def union_categories(dfs, cat_cols=None):
+def union_categories(dfs: List[pd.DataFrame], cat_cols: Union[Set[str], None] = None) -> None:
     """
     Recreate specified categoricals on the union of categories inplace.
 
@@ -43,7 +44,7 @@ def union_categories(dfs, cat_cols=None):
                 df[col] = df[col].cat.set_categories(col_categories[col])
 
 
-def concatenate_with_categories(dfs, **kwargs):
+def concatenate_with_categories(dfs: List[pd.DataFrame], **kwargs) -> pd.DataFrame:
     """
     Concatenate dataframes retaining categorical columns.
 

@@ -13,7 +13,7 @@ import tarfile
 from multiprocessing.pool import ThreadPool
 from subprocess import Popen, PIPE
 
-import pandas as pd
+import pandas as pd # type: ignore
 import yaml
 
 
