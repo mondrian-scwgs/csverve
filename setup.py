@@ -41,7 +41,7 @@ setup(
     description="todo: add description",
     entry_points={
         'console_scripts': [
-            'csverve=csverve.cli:main',
+            'csverve=csverve.cli:cli',
         ],
     },
     install_requires=requirements,

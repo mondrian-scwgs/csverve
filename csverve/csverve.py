@@ -884,7 +884,7 @@ def rewrite_csv_file(
     """
 
     if os.path.exists(filepath + '.yaml'):
-        csvinput : Union[CsverveInput, IrregularCsverveInput] = CsverveInput(filepath)
+        csvinput: Union[CsverveInput, IrregularCsverveInput] = CsverveInput(filepath)
     else:
         assert dtypes
         csvinput = IrregularCsverveInput(filepath, dtypes)
