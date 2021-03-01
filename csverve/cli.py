@@ -86,14 +86,27 @@ def concat(
 @cli.command()
 @click.option('--in_f', multiple=True, required=True, help='CSV file path, allows multiple paths.')
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
+@click.option('--col_name', required=True, help='Column name to be added.')
+@click.option('--col_val', required=True, help='Column value to be added (one value for all).')
+@click.option('--col_dype', required=True, help='Column pandas dtype.')
 @click.option('--write_header', is_flag=True, default=False, help='Writer header to resulting CSV.')
 def annotate(
     in_f,
     out_f,
+    col_name,
+    col_val,
+    col_dtype,
     write_header,
 ):
-    # TODO
-    pass
+    csvinput = csverve.CsverveInput(in_f)
+    metrics_df = csvinput.read_csv()
+    metrics_df[col_name] = col_val
+
+    csv_dtypes = csvinput.dtypes
+    csv_dtypes[col_name] = col_dtype
+
+    output = csverve.CsverveOutput(out_f, csv_dtypes, header=write_header)
+    output.write_df(metrics_df)
 
 
 if __name__ == "__main__":
