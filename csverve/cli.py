@@ -98,15 +98,14 @@ def annotate(
     col_dtype,
     write_header,
 ):
-    csvinput = csverve.CsverveInput(in_f)
-    metrics_df = csvinput.read_csv()
-    metrics_df[col_name] = col_val
-
-    csv_dtypes = csvinput.dtypes
-    csv_dtypes[col_name] = col_dtype
-
-    output = csverve.CsverveOutput(out_f, csv_dtypes, header=write_header)
-    output.write_df(metrics_df)
+    csverve.simple_annotate_csv(
+        in_f,
+        out_f,
+        col_name,
+        col_val,
+        col_dtype,
+        write_header,
+    )
 
 
 if __name__ == "__main__":

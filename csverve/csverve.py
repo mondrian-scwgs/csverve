@@ -833,6 +833,37 @@ def annotate_csv(
     output.write_df(metrics_df)
 
 
+def simple_annotate_csv(
+    in_f: str,
+    out_f: str,
+    col_name: str,
+    col_val: str,
+    col_dtype: str,
+    write_header: bool = False,
+) -> None:
+    """
+    Simplified version of the annotate_csv method.
+    Add column with the same value for all rows.
+
+    @param in_f:
+    @param out_f:
+    @param col_name:
+    @param col_val:
+    @param col_dtype:
+    @param write_header:
+    @return:
+    """
+    csvinput = CsverveInput(in_f)
+    metrics_df = csvinput.read_csv()
+    metrics_df[col_name] = col_val
+
+    csv_dtypes = csvinput.dtypes
+    csv_dtypes[col_name] = col_dtype
+
+    output = CsverveOutput(out_f, csv_dtypes, header=write_header)
+    output.write_df(metrics_df)
+
+
 def add_col_from_dict(
     infile,
     col_data,
