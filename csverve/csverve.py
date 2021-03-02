@@ -469,7 +469,7 @@ class CsverveOutput(object):
 
         yamldata: Dict[str, Any] = {'header': self.header, 'sep': self.sep, 'columns': []}
 
-        assert self.columns
+        assert self.columns is not None
         for column in self.columns:
             data = {'name': column, 'dtype': type_converter[self.dtypes[column]]}
             yamldata['columns'].append(data)
