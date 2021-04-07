@@ -1020,7 +1020,7 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: str) -> pd.DataFrame:
     else:
         on_split = [on]
 
-    _validate_merge_cols(frames, on)
+    _validate_merge_cols(frames, on_split)
 
     if len(frames) == 1:
         return frames[0]
@@ -1029,12 +1029,13 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: str) -> pd.DataFrame:
         left: pd.DataFrame = frames[0]
         right: pd.DataFrame = frames[1]
         cols_to_use: List[str] = list(right.columns.difference(left.columns))
-        cols_to_use += on
+        cols_to_use += on_split
         cols_to_use = list(set(cols_to_use))
 
         merged_frame: pd.DataFrame = pd.merge(
-            left, right[cols_to_use], how=how, on=on,
+            left, right[cols_to_use], how=how, on=on_split,
         )
+
         for i, frame in enumerate(frames[2:]):
             merged_frame = pd.merge(
                 merged_frame, frame, how=how, on=on,
