@@ -1,9 +1,12 @@
-import string
-import csverve.csverve as csverve
-import pandas as pd
-import random
 import os
+import random
+import string
+
+import csverve.api as api
+import pandas as pd
 import yaml as y
+from csverve.core.csverve_input import CsverveInput
+from csverve.errors import CsverveParseError
 
 
 class TestInputs:
@@ -15,8 +18,8 @@ class TestInputs:
         assert len({n_dfs, len(dtypes)}) == 1
 
         for i in range(n_dfs):
-            csverve.write_dataframe_to_csv_and_yaml(dfs[i], names[i],
-                                                     dtypes[i], write_heads)
+            api.write_dataframe_to_csv_and_yaml(dfs[i], names[i],
+                                                dtypes[i], write_heads)
         return names
 
     def make_test_df(self, dtypes, length):
@@ -52,7 +55,7 @@ class TestInputs:
 
     def _rand_int_col(self, n, scale=1):
         return list(range(n)) * scale
-        #return [random.randint(0, 10) for _ in range(n)]
+        # return [random.randint(0, 10) for _ in range(n)]
 
     def _rand_bool_col(self, n):
         return [random.choice([True, False]) for _ in range(n)]
@@ -69,7 +72,7 @@ class TestInputs:
 class TestValidationHelpers:
 
     def _raises_correct_error(self, function, *args,
-                              expected_error=csverve.CsverveParseError,
+                              expected_error=CsverveParseError,
                               **kwargs):
         raised = False
         try:
@@ -79,21 +82,21 @@ class TestValidationHelpers:
                 raised = True
             else:
                 print("raised wrong error: raised: {}, expected: {}"
-                       .format(type(e), expected_error))
+                      .format(type(e), expected_error))
         finally:
             return raised
 
     def dfs_exact_match(self, data, reference):
 
         if isinstance(data, str):
-            data = csverve.CsverveInput(data).read_csv()
+            data = CsverveInput(data).read_csv()
         if isinstance(reference, str):
-            reference = csverve.CsverveInput(reference).read_csv()
+            reference = CsverveInput(reference).read_csv()
 
         if set(data.columns) != set(reference.columns):
             return False
 
-        #read csv doesnt precicely read floats
+        # read csv doesnt precisely read floats
         data = data.round(5)
         reference = reference.round(5)
 
@@ -114,6 +117,8 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         annotations = {cell_id: {col: self.simulate_col(dtype, 1)[0]
                                  for col, dtype in dtypes.items()}
                        for cell_id in annotate_col}
+
+        annotations = pd.DataFrame(annotations).T
 
         return annotations
 
@@ -156,8 +161,8 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
 
         annotated = os.path.join(temp, "annotated.csv.gz")
 
-        csverve.annotate_csv(csv, annotation, annotated, ann_dtypes,
-                              write_header=head, on=on)
+        api.annotate_csv(csv, annotation, annotated, ann_dtypes,
+                         write_header=head, on=on)
 
         return csv, annotation, annotated
 
@@ -171,27 +176,19 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         :return:
         """
         if isinstance(csv, str):
-            csv = csverve.CsverveInput(csv).read_csv()
+            csv = CsverveInput(csv).read_csv()
 
-        annotation_comparable = {on: list(annotation.keys())}
-        annotation_as_list = list(annotation.values())
-
-        for k in annotation_as_list[0].keys():
-            annotation_comparable[k] = [ann[k] for ann in annotation_as_list]
-
-        annotation_comparable = pd.DataFrame(annotation_comparable)
-
-        compare = csv.merge(annotation_comparable, how="outer", on=on)
+        compare = csv.merge(annotation, how="outer", on=on)
 
         return os.path.exists(annotated) \
                and self.dfs_exact_match(compare, annotated)
-
 
 
 class ConcatHelpers(TestInputs, TestValidationHelpers):
     """
     helpers for testing concat functions
     """
+
     def base_test_concat(self, length, dtypes, write=False, dir=None,
                          get_ref=False, write_head=True):
         """
@@ -226,6 +223,7 @@ class WriteHelpers(TestInputs, TestValidationHelpers):
     """
     helpers class for testing of csverve writing
     """
+
     def write_file_successful(self, df, csv, wrote_header=True):
         head = "infer"
         if not wrote_header:
@@ -261,6 +259,7 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
     """
     helpers class for testing of merging
     """
+
     def make_mergeable_test_dfs(self, dtypes, shared, length):
         """
         make dfs that can be merged
@@ -269,7 +268,11 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
         :param length: length of test dfs
         :return:
         """
+
         for dtype_set in dtypes:
+            if not set(shared).issubset(set(dtype_set.keys())):
+                raise Exception(shared, dtype_set, dtype_set.keys())
+
             assert set(shared).issubset(set(dtype_set.keys()))
 
         dfs = self.make_test_dfs(dtypes, length)
@@ -295,6 +298,7 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
         :param dir: temp dir to test in
         :param write_head: T/F write header to csv (before and after testing)
         """
+
         dfs = self.make_mergeable_test_dfs(dtypes, on, length)
 
         outs = [dfs]
