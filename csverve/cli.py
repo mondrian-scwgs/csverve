@@ -1,9 +1,8 @@
 """Console script for csverve."""
 import sys
 import click
-import csverve
 import os
-
+import csverve.api as api
 
 @click.group()
 def cli():
@@ -31,7 +30,7 @@ def merge(
         in_filenames[f"file_{counter}"] = file
         counter += 1
 
-    csverve.merge_csv(
+    api.merge_csv(
         in_filenames,
         out_f,
         how,
@@ -52,7 +51,7 @@ def rewrite(
     assert os.path.exists(in_f)
     assert os.path.exists(f"{in_f}.yaml")
 
-    csverve.rewrite_csv_file(
+    api.rewrite_csv_file(
         in_f,
         out_f,
         write_header,
@@ -76,7 +75,7 @@ def concat(
         in_filenames[f"file_{counter}"] = file
         counter += 1
 
-    csverve.concatenate_csv(
+    api.concatenate_csv(
         in_filenames,
         out_f,
         write_header,
@@ -98,7 +97,7 @@ def annotate(
     col_dtype,
     write_header,
 ):
-    csverve.simple_annotate_csv(
+    api.simple_annotate_csv(
         in_f,
         out_f,
         col_name,
