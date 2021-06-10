@@ -22,19 +22,11 @@ def merge(
     on,
     write_header,
 ):
-    files = list(in_f)
-    in_filenames = {}
-
-    counter = 1
-    for file in files:
-        in_filenames[f"file_{counter}"] = file
-        counter += 1
-
     api.merge_csv(
-        in_filenames,
+        list(in_f),
         out_f,
         how,
-        ','.join(list(on)),
+        on,
         write_header,
     )
 
@@ -67,16 +59,8 @@ def concat(
     out_f,
     write_header,
 ):
-    files = list(in_f)
-    in_filenames = {}
-
-    counter = 1
-    for file in files:
-        in_filenames[f"file_{counter}"] = file
-        counter += 1
-
     api.concatenate_csv(
-        in_filenames,
+        list(in_f),
         out_f,
         write_header,
     )
