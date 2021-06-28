@@ -23,6 +23,7 @@ def merge(
     on,
     write_header,
 ):
+    on = list(on)
     api.merge_csv(
         list(in_f),
         out_f,
@@ -44,8 +45,6 @@ def rewrite(
     dtypes
 ):
     assert os.path.exists(in_f)
-    assert os.path.exists(f"{in_f}.yaml")
-
 
     with open(dtypes, 'rt') as reader:
         dtypes_data = yaml.load(reader)

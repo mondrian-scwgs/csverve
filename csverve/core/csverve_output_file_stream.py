@@ -3,17 +3,18 @@ import shutil
 from typing import List, Dict, TextIO
 
 from csverve.core import CsverveOutput
+from csverve.errors import CsverveInputError
 
 
 class CsverveOutputFileStream(CsverveOutput):
     def __init__(
-        self,
-        filepath: str,
-        dtypes: Dict[str, str],
-        columns: List[str],
-        write_header: bool = True,
-        na_rep: str = 'NaN',
-        sep: str = ',',
+            self,
+            filepath: str,
+            dtypes: Dict[str, str],
+            columns: List[str],
+            write_header: bool = True,
+            na_rep: str = 'NaN',
+            sep: str = ',',
     ) -> None:
         """
         CSV file and all related metadata.
@@ -62,6 +63,15 @@ class CsverveOutputFileStream(CsverveOutput):
 
         self.write_yaml()
 
+    @staticmethod
+    def _file_type(filepath) -> str:
+        if filepath.endswith('gz'):
+            return 'gzip'
+        elif filepath.endswith('csv'):
+            return 'plain-text'
+        else:
+            raise CsverveInputError('Unsupported file type: {}'.format(filepath))
+
     def rewrite_csv(self, csvfile: str) -> None:
         """
         Rewrite CSV.
@@ -71,11 +81,14 @@ class CsverveOutputFileStream(CsverveOutput):
 
         assert self.columns
         assert self.dtypes
-        with gzip.open(self.filepath, 'wt') as writer:
-            if self.write_header:
-                self._write_header_to_file(writer)
 
-            with gzip.open(csvfile, 'rt') as data_stream:
+        filetype = self._file_type(csvfile)
+
+        opener = gzip.open if filetype == 'gzip' else open
+
+        with gzip.open(self.filepath, 'wt') as writer:
+
+            with opener(csvfile, 'rt') as data_stream:
                 shutil.copyfileobj(
                     data_stream, writer, length=16 * 1024 * 1024
                 )
