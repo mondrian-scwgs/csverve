@@ -3,6 +3,7 @@ import sys
 import click
 import os
 import csverve.api as api
+import yaml
 
 @click.group()
 def cli():
@@ -34,19 +35,26 @@ def merge(
 @cli.command()
 @click.option('--in_f', required=True, help='CSV file path. Expects YAML w/ the same path as CSV with .yaml extension.')
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
+@click.option('--dtypes', required=True, help='dtypes yaml file')
 @click.option('--write_header', is_flag=True, default=False, help='Writer header to resulting CSV.')
 def rewrite(
     in_f,
     out_f,
     write_header,
+    dtypes
 ):
     assert os.path.exists(in_f)
     assert os.path.exists(f"{in_f}.yaml")
+
+
+    with open(dtypes, 'rt') as reader:
+        dtypes_data = yaml.load(reader)
 
     api.rewrite_csv_file(
         in_f,
         out_f,
         write_header,
+        dtypes_data
     )
 
 
