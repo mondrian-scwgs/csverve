@@ -11,11 +11,19 @@ from csverve.errors import CsverveConcatException
 from csverve.utils import concatenate_csv_files_quick_lowmem, concatenate_csv_files_pandas
 
 
+def get_columns(infile):
+    return CsverveInput(infile).columns
+
+
+def get_dtypes(infile):
+    return CsverveInput(infile).dtypes
+
+
 def rewrite_csv_file(
-    filepath: str,
-    outputfile: str,
-    write_header: bool = True,
-    dtypes: Dict[str, str] = None,
+        filepath: str,
+        outputfile: str,
+        write_header: bool = True,
+        dtypes: Dict[str, str] = None,
 ) -> None:
     """
     Generate header less csv files.
@@ -48,11 +56,11 @@ def rewrite_csv_file(
 
 
 def merge_csv(
-    in_filenames: Union[List[str], Dict[str, str]],
-    out_filename: str,
-    how: str,
-    on: List[str],
-    write_header: bool = True
+        in_filenames: Union[List[str], Dict[str, str]],
+        out_filename: str,
+        how: str,
+        on: List[str],
+        write_header: bool = True
 ) -> None:
     """
     Create one gzipped CSV out of multiple gzipped CSVs.
@@ -118,12 +126,12 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
 
 
 def annotate_csv(
-    infile: str,
-    annotation_df: pd.DataFrame,
-    outfile,
-    annotation_dtypes,
-    on="cell_id",
-    write_header: bool = True,
+        infile: str,
+        annotation_df: pd.DataFrame,
+        outfile,
+        annotation_dtypes,
+        on="cell_id",
+        write_header: bool = True,
 ):
     """
     TODO: fill this in
@@ -165,12 +173,12 @@ def annotate_csv(
 
 
 def simple_annotate_csv(
-    in_f: str,
-    out_f: str,
-    col_name: str,
-    col_val: str,
-    col_dtype: str,
-    write_header: bool = False,
+        in_f: str,
+        out_f: str,
+        col_name: str,
+        col_val: str,
+        col_dtype: str,
+        write_header: bool = False,
 ) -> None:
     """
     Simplified version of the annotate_csv method.
@@ -196,11 +204,11 @@ def simple_annotate_csv(
 
 
 def add_col_from_dict(
-    infile,
-    col_data,
-    outfile,
-    dtypes,
-    write_header=True
+        infile,
+        col_data,
+        outfile,
+        dtypes,
+        write_header=True
 ):
     """
     TODO: fill this in
@@ -229,10 +237,10 @@ def add_col_from_dict(
 
 
 def write_dataframe_to_csv_and_yaml(
-    df: pd.DataFrame,
-    outfile: str,
-    dtypes: Dict[str, str],
-    write_header: bool = True
+        df: pd.DataFrame,
+        outfile: str,
+        dtypes: Dict[str, str],
+        write_header: bool = True
 ) -> None:
     """
     Output pandas dataframe to a CSV and meta YAML files.
