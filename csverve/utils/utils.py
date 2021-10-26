@@ -129,8 +129,10 @@ def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str]) 
 
     # check that columns to be merged have identical values
     standard = frames[0][on]
+    standard = standard.sort_values(on).reset_index(drop=True)
     for frame in frames:
-        if not standard.equals(frame[on]):
+        comp_df = frame[on].sort_values(on).reset_index(drop=True)
+        if not standard.equals(comp_df):
             raise CsverveMergeColumnMismatchException("columns on which to merge must be identical")
 
     # check that columns to be merged have same dtypes
