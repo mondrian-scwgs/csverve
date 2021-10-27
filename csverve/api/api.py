@@ -147,8 +147,6 @@ def annotate_csv(
     csvinput = CsverveInput(infile)
     metrics_df = csvinput.read_csv()
 
-    annotation_df[on] = annotation_df.index
-
     # get annotation rows that correspond to rows in on
     reformed_annotation = annotation_df[annotation_df[on].isin(metrics_df[on])]
 
