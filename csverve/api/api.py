@@ -255,7 +255,7 @@ def write_dataframe_to_csv_and_yaml(
     csvoutput.write_df()
 
 
-def read_csv_and_yaml(infile: str, chunksize: int = None) -> pd.DataFrame:
+def read_csv(infile: str, chunksize: int = None) -> pd.DataFrame:
     """
     Read in CSV file and return as a pandas DataFrame.
 
