@@ -100,8 +100,10 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
     @param write_header: boolean, True = write header, False = don't write header.
     @return:
     """
+    if isinstance(inputfiles, dict):
+        inputfiles = list(inputfiles.values())
 
-    if inputfiles == [] or inputfiles == {}:
+    if inputfiles == []:
         raise CsverveConcatException("nothing provided to concat")
 
     inputs: List[CsverveInput] = [CsverveInput(infile) for infile in inputfiles]
@@ -146,6 +148,7 @@ def annotate_csv(
 
     csvinput = CsverveInput(infile)
     metrics_df = csvinput.read_csv()
+
 
     # get annotation rows that correspond to rows in on
     reformed_annotation = annotation_df[annotation_df[on].isin(metrics_df[on])]
@@ -255,7 +258,7 @@ def write_dataframe_to_csv_and_yaml(
     csvoutput.write_df()
 
 
-def read_csv(infile: str, chunksize: int = None) -> pd.DataFrame:
+def read_csv(infile: str, chunksize: int = None, usecols=None) -> pd.DataFrame:
     """
     Read in CSV file and return as a pandas DataFrame.
 
@@ -266,4 +269,4 @@ def read_csv(infile: str, chunksize: int = None) -> pd.DataFrame:
     @param chunksize: Number of rows to read at a time (optional, applies to large datasets).
     @return: pandas DataFrame.
     """
-    return CsverveInput(infile).read_csv(chunksize=chunksize)
+    return CsverveInput(infile).read_csv(chunksize=chunksize, usecols=usecols)

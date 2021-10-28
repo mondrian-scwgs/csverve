@@ -1,13 +1,12 @@
 import gzip
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Any
 
 import pandas as pd  # type: ignore
 from csverve.errors import CsverveInputError
-from csverve.errors import CsverveParseError
 
 
 class IrregularCsverveInput(object):
-    def __init__(self, filepath: str, dtypes: Dict[str, str]) -> None:
+    def __init__(self, filepath: str, dtypes: Dict[str, str], sep=',') -> None:
         """
         CSV file and all related metadata.
 
@@ -16,7 +15,7 @@ class IrregularCsverveInput(object):
         """
         self.filepath: str = filepath
 
-        self.sep = self.get_seperator()
+        self.sep = sep
         self.columns = self.get_columns()
 
         self.dtypes: Dict[str, str] = dtypes
@@ -38,23 +37,6 @@ class IrregularCsverveInput(object):
         @return: YAML metadata path.
         """
         return self.filepath + '.yaml'
-
-    def get_seperator(self) -> str:
-        """
-        Detect whether file is tab or comma separated from header.
-        @return: '\t', or ',', or raise error if unable to detect separator.
-        """
-        opener: Any = gzip.open if self.__file_type == 'gzip' else open
-        with opener(self.filepath, 'rt') as inputfile:
-            header: str = inputfile.readline().strip()
-
-        tab = '\t' in header
-        comma = ',' in header
-
-        if (tab and comma) or (not tab and not comma):
-            raise CsverveParseError("Unable to detect separator from {}".format(header))
-
-        return '\t' if tab else ','
 
     def get_columns(self) -> List[str]:
         """

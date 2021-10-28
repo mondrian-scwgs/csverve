@@ -14,6 +14,7 @@ import pandas as pd
 import pytest
 from click.testing import CliRunner
 from csverve import cli
+from csverve.core.csverve_input import CsverveInput
 from csverve.errors import CsverveConcatException
 from csverve.errors import CsverveMergeCommonColException
 from csverve.errors import CsverveMergeDtypesEmptyMergeSet
@@ -125,11 +126,9 @@ class TestAnnotateCsv(helpers.AnnotationHelpers):
         csv, annotation = self.make_ann_test_inputs(tmpdir, n_rows, dtypes,
                                                     ann_dtypes)
 
-        # annotation.columns = [i for i,v in enumerate(annotation.columns.values)]
-        annotation.index = range(len(annotation.index))
-
-        # raise Exception(csv, annotation, annotated, ann_dtypes)
         api.annotate_csv(csv, annotation, annotated, ann_dtypes)
+
+        csv = CsverveInput(csv).read_csv().merge(annotation)
 
         assert self.dfs_exact_match(annotated, csv)
 
