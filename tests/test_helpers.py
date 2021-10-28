@@ -108,17 +108,21 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
     helper functions for testing the annotate_csv csverve function
     """
 
-    def sim_ann_input(self, annotate_col, dtypes):
+    def sim_ann_input(self, annotate_col, annotate_col_name, dtypes):
         """
         make annotation dict for test annotate_csv.
         :param annotate_col: column to create annotation on
         :param dtypes: dtypes for annotation dict
         """
-        annotations = {cell_id: {col: self.simulate_col(dtype, 1)[0]
-                                 for col, dtype in dtypes.items()}
-                       for cell_id in annotate_col}
 
-        annotations = pd.DataFrame(annotations).T
+        annotations = []
+
+        for cell_id in annotate_col:
+            outdict = {col: self.simulate_col(dtype, 1)[0] for col, dtype in dtypes.items()}
+            outdict[annotate_col_name] = cell_id
+            annotations.append(outdict)
+
+        annotations = pd.DataFrame(annotations)
 
         return annotations
 
@@ -139,7 +143,7 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         df = df[0]
         csv = csv[0]
 
-        annotation_input = self.sim_ann_input(df[on].tolist(), ann_dtypes)
+        annotation_input = self.sim_ann_input(df[on].tolist(), on, ann_dtypes)
 
         return csv, annotation_input
 
@@ -154,6 +158,7 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         :param write_header: T/F write header post-annotation
         :param on: col to annotate on:
         """
+
         csv, annotation = self.make_ann_test_inputs(temp, length,
                                                     dtypes, ann_dtypes,
                                                     write_header=head,

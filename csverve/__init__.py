@@ -13,4 +13,4 @@ from csverve.api import concatenate_csv
 from csverve.api import simple_annotate_csv
 from csverve.api import add_col_from_dict
 from csverve.api import write_dataframe_to_csv_and_yaml
-from csverve.api import read_csv_and_yaml
+from csverve.api import read_csv
