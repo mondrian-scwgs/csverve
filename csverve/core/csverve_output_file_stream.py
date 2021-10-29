@@ -84,10 +84,9 @@ class CsverveOutputFileStream(CsverveOutput):
 
         filetype = self._file_type(csvfile)
 
-        opener = gzip.open if filetype == 'gzip' else open
+        opener: Any = gzip.open if filetype == 'gzip' else open
 
         with gzip.open(self.filepath, 'wt') as writer:
-
             with opener(csvfile, 'rt') as data_stream:
                 shutil.copyfileobj(
                     data_stream, writer, length=16 * 1024 * 1024
