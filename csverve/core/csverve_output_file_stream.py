@@ -1,6 +1,6 @@
 import gzip
 import shutil
-from typing import List, Dict, TextIO
+from typing import List, Dict, TextIO, Any
 
 from csverve.core import CsverveOutput
 from csverve.errors import CsverveInputError
