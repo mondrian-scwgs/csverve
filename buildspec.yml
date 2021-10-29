@@ -1,5 +1,7 @@
 version: 0.2
 
+variables:
+  PYPI_TOKEN: $PYPI_TOKEN
 phases:
   pre_build:
     commands:
