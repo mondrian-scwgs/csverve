@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 
 import yaml
 from csverve.errors import CsverveWriterError
-import csverve.utils as utils
+from csverve import utils
 
 
 class CsverveOutput(object):
