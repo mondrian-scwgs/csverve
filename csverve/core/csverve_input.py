@@ -98,14 +98,14 @@ class CsverveInput(object):
             df[column_name] = df[column_name].astype(self.dtypes[column_name])
         return df
 
-    def _verify_data(self, df: pd.DataFrame) -> None:
+    def _verify_data(self, df: pd.DataFrame, columns) -> None:
         """
         Verify columns of DataFrame match those of class property.
 
         @param df: Pandas DataFrame.
         @return:
         """
-        if not set(list(df.columns.values)) == set(self.columns):
+        if not set(list(df.columns.values)) == set(columns):
             raise CsverveParseError("metadata mismatch in {}".format(self.filepath))
 
     def read_csv(self, chunksize: int = None, usecols = None) -> pd.DataFrame:
@@ -124,6 +124,7 @@ class CsverveInput(object):
         # if header exists then use first line (0) as header
         header: Union[int, None] = 0 if self.header else None
         names: Union[None, List[str]] = None if self.header else self.columns
+        columns: List[str] = usecols if usecols else self.columns
 
         try:
             data: pd.DataFrame = pd.read_csv(
@@ -137,11 +138,11 @@ class CsverveInput(object):
                 usecols=usecols
             )
         except pd.errors.EmptyDataError:
-            data = pd.DataFrame(columns=self.columns)
+            data = pd.DataFrame(columns=columns)
             data = self._cast_dataframe(data)
 
         if chunksize:
-            return return_gen(data)
+            return return_gen(data, columns)
         else:
-            self._verify_data(data)
+            self._verify_data(data, columns)
             return data
