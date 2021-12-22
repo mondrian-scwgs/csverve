@@ -116,9 +116,9 @@ class CsverveInput(object):
         @return: pandas DataFrame.
         """
 
-        def return_gen(df_iterator):
+        def return_gen(df_iterator, columns):
             for df in df_iterator:
-                self._verify_data(df)
+                self._verify_data(df, columns)
                 yield df
 
         # if header exists then use first line (0) as header
