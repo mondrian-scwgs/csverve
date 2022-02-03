@@ -3,7 +3,7 @@
 
 __author__ = """Shah Lab"""
 __email__ = 'todo@todo.com'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 # csverve methods
