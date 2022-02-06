@@ -258,7 +258,7 @@ def write_dataframe_to_csv_and_yaml(
     csvoutput.write_df()
 
 
-def read_csv(infile: str, chunksize: int = None, usecols=None) -> pd.DataFrame:
+def read_csv(infile: str, chunksize: int = None, usecols = None, dtype = None) -> pd.DataFrame:
     """
     Read in CSV file and return as a pandas DataFrame.
 
@@ -267,6 +267,8 @@ def read_csv(infile: str, chunksize: int = None, usecols=None) -> pd.DataFrame:
 
     @param infile: Path to CSV file.
     @param chunksize: Number of rows to read at a time (optional, applies to large datasets).
+    @param usecols: Restrict to specific columns (optional).
+    @param dtype: Override the dtypes on specific columns (optional).
     @return: pandas DataFrame.
     """
-    return CsverveInput(infile).read_csv(chunksize=chunksize, usecols=usecols)
+    return CsverveInput(infile).read_csv(chunksize=chunksize, usecols=usecols, dtype=dtype)
