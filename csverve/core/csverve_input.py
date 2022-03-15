@@ -108,11 +108,13 @@ class CsverveInput(object):
         if not set(list(df.columns.values)) == set(columns):
             raise CsverveParseError("metadata mismatch in {}".format(self.filepath))
 
-    def read_csv(self, chunksize: int = None, usecols = None) -> pd.DataFrame:
+    def read_csv(self, chunksize: int = None, usecols = None, dtype = None) -> pd.DataFrame:
         """
         Read CSV.
 
         @param chunksize: Number of rows to read at a time (optional, applies to large datasets).
+        @param usecols: Restrict to specific columns (optional).
+        @param dtype: Override the dtypes on specific columns (optional).
         @return: pandas DataFrame.
         """
 
@@ -126,6 +128,15 @@ class CsverveInput(object):
         names: Union[None, List[str]] = None if self.header else self.columns
         columns: List[str] = usecols if usecols else self.columns
 
+        # Override dtypes
+        final_dtype = self.dtypes
+        if dtype is not None:
+            for name, dtype in dtype.items():
+                if name in final_dtype:
+                    final_dtype[name] = dtype
+                else:
+                    raise ValueError(f'dtype column {name} not present')
+
         try:
             data: pd.DataFrame = pd.read_csv(
                 self.filepath,
@@ -134,7 +145,7 @@ class CsverveInput(object):
                 sep=self.separator,
                 header=header,
                 names=names,
-                dtype=self.dtypes,
+                dtype=final_dtype,
                 usecols=usecols
             )
         except pd.errors.EmptyDataError:
