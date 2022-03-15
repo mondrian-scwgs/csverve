@@ -55,6 +55,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/mondrian-scwgs/csverve',
-    version="v0.2.2",
+    version="v0.2.3",
     zip_safe=False,
 )
