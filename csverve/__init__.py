@@ -5,7 +5,6 @@ __author__ = """Shah Lab"""
 __email__ = 'todo@todo.com'
 __version__ = '0.2.4'
 
-
 # csverve methods
 from csverve.api import rewrite_csv_file
 from csverve.api import merge_csv

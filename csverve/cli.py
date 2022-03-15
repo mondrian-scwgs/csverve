@@ -61,15 +61,18 @@ def rewrite(
 @click.option('--in_f', multiple=True, required=True, help='CSV file path, allows multiple paths.')
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
 @click.option('--write_header', is_flag=True, default=False, help='Writer header to resulting CSV.')
+@click.option('--drop_duplicates', is_flag=True, default=False, help='remove duplicate rows')
 def concat(
     in_f,
     out_f,
     write_header,
+    drop_duplicates
 ):
     api.concatenate_csv(
         list(in_f),
         out_f,
         write_header,
+        drop_duplicates
     )
 
 

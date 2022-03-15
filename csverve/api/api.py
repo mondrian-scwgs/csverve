@@ -91,7 +91,8 @@ def merge_csv(
     csvoutput.write_df()
 
 
-def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = True) -> None:
+def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = True,
+                    drop_duplicates: bool = False) -> None:
     """
     Concatenate gzipped CSV files, dtypes in meta YAML files must be the same.
 
@@ -121,10 +122,14 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
     if not all(columns[0] == elem for elem in columns):
         low_memory = False
 
+    if drop_duplicates:
+        low_memory = False
+
     if low_memory:
         concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns[0], write_header=write_header)
     else:
-        concatenate_csv_files_pandas(inputfiles, output, dtypes, write_header=write_header)
+        concatenate_csv_files_pandas(inputfiles, output, dtypes, write_header=write_header,
+                                     drop_duplicates=drop_duplicates)
 
 
 def annotate_csv(
@@ -148,7 +153,6 @@ def annotate_csv(
 
     csvinput = CsverveInput(infile)
     metrics_df = csvinput.read_csv()
-
 
     # get annotation rows that correspond to rows in on
     reformed_annotation = annotation_df[annotation_df[on].isin(metrics_df[on])]
