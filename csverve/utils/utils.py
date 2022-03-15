@@ -66,7 +66,8 @@ def concatenate_csv_files_pandas(
     in_filenames: Union[List[str], Dict[str, str]],
     out_filename: str,
     dtypes: Dict[str, str],
-    write_header: bool = True
+    write_header: bool = True,
+    drop_duplicates: bool = False,
 ) -> None:
     """
     Concatenate gzipped CSV files.
@@ -85,6 +86,8 @@ def concatenate_csv_files_pandas(
         CsverveInput(in_filename).read_csv() for in_filename in in_filenames
     ]
     concat_data: pd.DataFrame = pd.concat(data, ignore_index=True)
+    if drop_duplicates:
+        concat_data = concat_data.drop_duplicates()
     csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
         concat_data, out_filename, dtypes,  write_header=write_header
     )
