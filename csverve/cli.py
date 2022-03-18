@@ -81,7 +81,7 @@ def concat(
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
 @click.option('--col_name', required=True, help='Column name to be added.')
 @click.option('--col_val', required=True, help='Column value to be added (one value for all).')
-@click.option('--col_dype', required=True, help='Column pandas dtype.')
+@click.option('--col_dtype', required=True, help='Column pandas dtype.')
 @click.option('--write_header', is_flag=True, default=False, help='Writer header to resulting CSV.')
 def annotate(
     in_f,
