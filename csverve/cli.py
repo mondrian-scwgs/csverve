@@ -77,7 +77,7 @@ def concat(
 
 
 @cli.command()
-@click.option('--in_f', multiple=True, required=True, help='CSV file path, allows multiple paths.')
+@click.option('--in_f', required=True, help='CSV file path, allows multiple paths.')
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
 @click.option('--col_name', required=True, help='Column name to be added.')
 @click.option('--col_val', required=True, help='Column value to be added (one value for all).')
