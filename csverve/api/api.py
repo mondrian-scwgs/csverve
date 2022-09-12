@@ -22,25 +22,28 @@ def get_dtypes(infile):
 def rewrite_csv_file(
         filepath: str,
         outputfile: str,
-        write_header: bool = True,
+        skip_header: bool = True,
         dtypes: Dict[str, str] = None,
+        **kwargs
 ) -> None:
     """
     Generate header less csv files.
 
     @param filepath: File path of CSV.
     @param outputfile: File path of header less CSV to be generated.
-    @param write_header: boolean, True = write header, False = don't write header.
+    @param skip_header: boolean, True = write header, False = don't write header.
     @param dtypes: Dictionary of pandas dtypes, where key = column name, value = dtype.
     @return:
     """
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
 
     if os.path.exists(filepath + '.yaml'):
         csvinput: Union[CsverveInput, IrregularCsverveInput] = CsverveInput(filepath)
         df = csvinput.read_csv()
 
         csvoutput_df = CsverveOutputDataFrame(
-            df, outputfile, write_header=write_header,
+            df, outputfile, skip_header=skip_header,
             dtypes=csvinput.dtypes
         )
         csvoutput_df.write_df()
@@ -49,7 +52,7 @@ def rewrite_csv_file(
         csvinput = IrregularCsverveInput(filepath, dtypes)
 
         csvoutput_fs = CsverveOutputFileStream(
-            outputfile, write_header=write_header, columns=csvinput.columns,
+            outputfile, skip_header=skip_header, columns=csvinput.columns,
             dtypes=csvinput.dtypes
         )
         csvoutput_fs.rewrite_csv(filepath)
@@ -60,7 +63,8 @@ def merge_csv(
         out_filename: str,
         how: str,
         on: List[str],
-        write_header: bool = True
+        skip_header: bool = False,
+        **kwargs
 ) -> None:
     """
     Create one gzipped CSV out of multiple gzipped CSVs.
@@ -69,9 +73,12 @@ def merge_csv(
     @param out_filename: Path to newly merged CSV
     @param how: How to join DataFrames (inner, outer, left, right).
     @param on: Column(s) to join on, comma separated if multiple.
-    @param write_header: boolean, True = write header, False = don't write header
+    @param skip_header: boolean, True = write header, False = don't write header
     @return:
     """
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+
     if isinstance(in_filenames, dict):
         in_filenames = list(in_filenames.values())
 
@@ -86,21 +93,24 @@ def merge_csv(
     dtypes_: Dict[str, str] = utils.merge_dtypes(dtypes)
 
     csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
-        merged_data, out_filename, dtypes_, write_header=write_header
+        merged_data, out_filename, dtypes_, skip_header=skip_header
     )
     csvoutput.write_df()
 
 
-def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = True,
-                    drop_duplicates: bool = False) -> None:
+def concatenate_csv(inputfiles: List[str], output: str, skip_header: bool = True,
+                    drop_duplicates: bool = False, **kwargs) -> None:
     """
     Concatenate gzipped CSV files, dtypes in meta YAML files must be the same.
 
     @param inputfiles: List of gzipped CSV file paths, or a dictionary where the keys are file paths.
     @param output: Path of resulting concatenated gzipped CSV file and meta YAML.
-    @param write_header: boolean, True = write header, False = don't write header.
+    @param skip_header: boolean, True = write header, False = don't write header.
     @return:
     """
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+
     if isinstance(inputfiles, dict):
         inputfiles = list(inputfiles.values())
 
@@ -126,9 +136,9 @@ def concatenate_csv(inputfiles: List[str], output: str, write_header: bool = Tru
         low_memory = False
 
     if low_memory:
-        concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns[0], write_header=write_header)
+        concatenate_csv_files_quick_lowmem(inputfiles, output, dtypes, columns[0], skip_header=skip_header)
     else:
-        concatenate_csv_files_pandas(inputfiles, output, dtypes, write_header=write_header,
+        concatenate_csv_files_pandas(inputfiles, output, dtypes, skip_header=skip_header,
                                      drop_duplicates=drop_duplicates)
 
 
@@ -138,7 +148,8 @@ def annotate_csv(
         outfile,
         annotation_dtypes,
         on="cell_id",
-        write_header: bool = True,
+        skip_header: bool = False,
+        **kwargs
 ):
     """
     TODO: fill this in
@@ -147,9 +158,12 @@ def annotate_csv(
     @param outfile:
     @param annotation_dtypes:
     @param on:
-    @param write_header:
+    @param skip_header:
     @return:
     """
+
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
 
     csvinput = CsverveInput(infile)
     metrics_df = csvinput.read_csv()
@@ -161,7 +175,7 @@ def annotate_csv(
     if reformed_annotation.empty:  # so we dont add NaNs
         return write_dataframe_to_csv_and_yaml(metrics_df, outfile,
                                                csvinput.dtypes,
-                                               write_header=write_header)
+                                               skip_header=skip_header)
 
     metrics_df = metrics_df.merge(reformed_annotation, on=on, how='outer')
 
@@ -173,7 +187,7 @@ def annotate_csv(
 
     csv_dtypes.update(annotation_dtypes)
 
-    output = CsverveOutputDataFrame(metrics_df, outfile, csv_dtypes, write_header=write_header)
+    output = CsverveOutputDataFrame(metrics_df, outfile, csv_dtypes, skip_header=skip_header)
     output.write_df()
 
 
@@ -183,7 +197,8 @@ def simple_annotate_csv(
         col_name: str,
         col_val: str,
         col_dtype: str,
-        write_header: bool = False,
+        skip_header: bool = False,
+        **kwargs
 ) -> None:
     """
     Simplified version of the annotate_csv method.
@@ -194,9 +209,12 @@ def simple_annotate_csv(
     @param col_name:
     @param col_val:
     @param col_dtype:
-    @param write_header:
+    @param skip_header:
     @return:
     """
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+
     csvinput = CsverveInput(in_f)
     metrics_df = csvinput.read_csv()
     metrics_df[col_name] = col_val
@@ -204,7 +222,7 @@ def simple_annotate_csv(
     csv_dtypes = csvinput.dtypes
     csv_dtypes[col_name] = col_dtype
 
-    output = CsverveOutputDataFrame(metrics_df, out_f, csv_dtypes, write_header=write_header)
+    output = CsverveOutputDataFrame(metrics_df, out_f, csv_dtypes, skip_header=skip_header)
     output.write_df()
 
 
@@ -213,7 +231,8 @@ def add_col_from_dict(
         col_data,
         outfile,
         dtypes,
-        write_header=True
+        skip_header=False,
+        **kwargs
 ):
     """
     TODO: fill this in
@@ -223,9 +242,12 @@ def add_col_from_dict(
     @param col_data:
     @param outfile:
     @param dtypes:
-    @param write_header:
+    @param skip_header:
     @return:
     """
+
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
 
     csvinput = CsverveInput(infile)
     csv_dtypes = csvinput.dtypes
@@ -236,7 +258,7 @@ def add_col_from_dict(
 
     dtypes = utils.merge_dtypes([csv_dtypes, dtypes])
     output = CsverveOutputDataFrame(
-        csvinput, outfile, dtypes, write_header=write_header
+        csvinput, outfile, dtypes, skip_header=skip_header
     )
     output.write_df()
 
@@ -245,7 +267,8 @@ def write_dataframe_to_csv_and_yaml(
         df: pd.DataFrame,
         outfile: str,
         dtypes: Dict[str, str],
-        write_header: bool = True
+        skip_header: bool = False,
+        **kwargs
 ) -> None:
     """
     Output pandas dataframe to a CSV and meta YAML files.
@@ -253,16 +276,20 @@ def write_dataframe_to_csv_and_yaml(
     @param df: pandas DataFrame.
     @param outfile: Path of CSV & YAML file to be written to.
     @param dtypes: dictionary of pandas dtypes by column, keys = column name, value = dtype.
-    @param write_header: boolean, True = write header, False = don't write header
+    @param skip_header: boolean, True = skip writing header, False = write header
     @return:
     """
+
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+
     csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
-        df, outfile, dtypes, write_header=write_header
+        df, outfile, dtypes, skip_header=skip_header
     )
     csvoutput.write_df()
 
 
-def read_csv(infile: str, chunksize: int = None, usecols = None, dtype = None) -> pd.DataFrame:
+def read_csv(infile: str, chunksize: int = None, usecols=None, dtype=None) -> pd.DataFrame:
     """
     Read in CSV file and return as a pandas DataFrame.
 

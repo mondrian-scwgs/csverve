@@ -63,11 +63,12 @@ def merge_dtypes(dtypes_all: List[Dict[str, str]]) -> Dict[str, str]:
 
 
 def concatenate_csv_files_pandas(
-    in_filenames: Union[List[str], Dict[str, str]],
-    out_filename: str,
-    dtypes: Dict[str, str],
-    write_header: bool = True,
-    drop_duplicates: bool = False,
+        in_filenames: Union[List[str], Dict[str, str]],
+        out_filename: str,
+        dtypes: Dict[str, str],
+        skip_header: bool = True,
+        drop_duplicates: bool = False,
+        **kwargs
 ) -> None:
     """
     Concatenate gzipped CSV files.
@@ -75,9 +76,12 @@ def concatenate_csv_files_pandas(
     @param in_filenames: List of gzipped CSV file paths, or a dictionary where the keys are file paths.
     @param out_filename: Path of resulting concatenated gzipped CSV file and meta YAML.
     @param dtypes: Dictionary of pandas dtypes, where key = column name, value = dtype.
-    @param write_header: boolean, True = write header, False = don't write header.
+    @param skip_header: boolean, True = write header, False = don't write header.
     @return:
     """
+
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
 
     if isinstance(in_filenames, dict):
         in_filenames = list(in_filenames.values())
@@ -89,17 +93,18 @@ def concatenate_csv_files_pandas(
     if drop_duplicates:
         concat_data = concat_data.drop_duplicates()
     csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
-        concat_data, out_filename, dtypes,  write_header=write_header
+        concat_data, out_filename, dtypes, skip_header=skip_header
     )
     csvoutput.write_df()
 
 
 def concatenate_csv_files_quick_lowmem(
-    inputfiles: List[str],
-    output: str,
-    dtypes: Dict[str, str],
-    columns: List[str],
-    write_header: bool = True
+        inputfiles: List[str],
+        output: str,
+        dtypes: Dict[str, str],
+        columns: List[str],
+        skip_header: bool = True,
+        **kwargs
 ) -> None:
     """
     Concatenate gzipped CSV files.
@@ -108,12 +113,14 @@ def concatenate_csv_files_quick_lowmem(
     @param output: Path of resulting concatenated gzipped CSV file and meta YAML.
     @param dtypes: Dictionary of pandas dtypes, where key = column name, value = dtype.
     @param columns: List of column names for newly concatenated gzipped CSV file.
-    @param write_header: boolean, True = write header, False = don't write header.
+    @param skip_header: boolean, True = write header, False = don't write header.
     @return:
     """
+    if kwargs.get('write_header') is not None:
+        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
 
     csvoutput: CsverveOutputFileStream = CsverveOutputFileStream(
-        output, dtypes, write_header=write_header, columns=columns
+        output, dtypes, skip_header=skip_header, columns=columns
     )
     csvoutput.write_data_streams(inputfiles)
 

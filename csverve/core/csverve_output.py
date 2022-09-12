@@ -1,24 +1,24 @@
 from typing import List, Dict, Any
 
 import yaml
-from csverve.errors import CsverveWriterError
 from csverve import utils
+from csverve.errors import CsverveWriterError
 
 
 class CsverveOutput(object):
     def __init__(
-        self,
-        filepath: str,
-        dtypes: Dict[str, str],
-        columns: List[str],
-        write_header: bool = True,
-        na_rep: str = 'NaN',
-        sep: str = ',',
+            self,
+            filepath: str,
+            dtypes: Dict[str, str],
+            columns: List[str],
+            skip_header: bool = True,
+            na_rep: str = 'NaN',
+            sep: str = ',',
     ) -> None:
         self.filepath: str = filepath
         self._verify_input()
 
-        self.write_header: bool = write_header
+        self.skip_header: bool = skip_header
         self.dtypes: Dict[str, str] = dtypes
         self.na_rep: str = na_rep
         self.sep: str = sep
@@ -57,7 +57,7 @@ class CsverveOutput(object):
         yaml_columns = [{'name': col, 'dtype': self.dtypes[col]} for col in self.columns]
 
         yamldata: Dict[str, Any] = {
-            'header': self.write_header,
+            'header': (not self.skip_header),
             'sep': self.sep,
             'columns': yaml_columns
         }

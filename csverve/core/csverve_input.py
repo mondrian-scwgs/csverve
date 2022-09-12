@@ -108,7 +108,7 @@ class CsverveInput(object):
         if not set(list(df.columns.values)) == set(columns):
             raise CsverveParseError("metadata mismatch in {}".format(self.filepath))
 
-    def read_csv(self, chunksize: int = None, usecols = None, dtype = None) -> pd.DataFrame:
+    def read_csv(self, chunksize: int = None, usecols=None, dtype=None) -> pd.DataFrame:
         """
         Read CSV.
 
