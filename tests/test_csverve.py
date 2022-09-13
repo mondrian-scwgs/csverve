@@ -144,7 +144,7 @@ class TestAnnotateCsv(helpers.AnnotationHelpers):
 
         csv, annotation, annotated = self.base_annotation_test(tmpdir, n_rows,
                                                                dtypes, ann_dtypes,
-                                                               head=False)
+                                                               skip_header=True)
 
         assert self.validate_annotation_test(csv, annotation, annotated, "cell_id")
 
@@ -182,8 +182,8 @@ class TestConcatCsv(helpers.ConcatHelpers):
 
         dfs, csvs, ref = self.base_test_concat(n_rows, [dtypes, dtypes], write=True,
                                                get_ref=True, dir=tmpdir,
-                                               write_head=False)
-        api.concatenate_csv(csvs, concatenated, write_header=False)
+                                               skip_header=True)
+        api.concatenate_csv(csvs, concatenated, skip_header=True)
 
         assert self.dfs_exact_match(ref, concatenated)
 
@@ -350,7 +350,7 @@ class TestConcatCsvFilesPandas(helpers.ConcatHelpers):
 
         dfs, csvs, ref = self.base_test_concat(n_rows, [dtypes, dtypes],
                                                write=True, get_ref=True,
-                                               dir=tmpdir, write_head=False)
+                                               dir=tmpdir, skip_header=True)
 
         utils.concatenate_csv_files_pandas(csvs, concatenated, dtypes, True)
 
@@ -371,7 +371,7 @@ class TestConcatCsvFilesQuickLowMem(helpers.ConcatHelpers):
 
         dfs, csvs, ref = self.base_test_concat(n_rows, [dtypes, dtypes],
                                                write=True, get_ref=True,
-                                               dir=tmpdir, write_head=False)
+                                               dir=tmpdir, skip_header=True)
 
         utils.concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
 
@@ -387,7 +387,7 @@ class TestConcatCsvFilesQuickLowMem(helpers.ConcatHelpers):
 
         dfs, csvs, ref = self.base_test_concat(n_rows * scale, [dtypes, dtypes],
                                                write=True, get_ref=True,
-                                               dir=tmpdir, write_head=False)
+                                               dir=tmpdir, skip_header=True)
 
         utils.concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
 
@@ -400,7 +400,7 @@ class TestWriteDataFrameToCsvAndYaml(helpers.WriteHelpers):
     """
 
     def validate_write_to_csv_yaml_test(self, df, dtypes, filename,
-                                        yaml_filename, wrote_header=True):
+                                        yaml_filename, skipped_header=False):
         """
         tests that write_data_frane_to_csv_and_yaml wrote data correctly
         :param df: input df
@@ -411,16 +411,16 @@ class TestWriteDataFrameToCsvAndYaml(helpers.WriteHelpers):
         """
         assert os.path.exists(filename)
         assert os.path.exists(yaml_filename)
-        assert self.write_file_successful(df, filename, wrote_header=wrote_header)
+        assert self.write_file_successful(df, filename, skipped_header=skipped_header)
         assert self.metadata_write_successful(dtypes, yaml_filename)
 
-    def base_write_to_csv_yaml_test(self, temp, dtypes, length, write_header=True):
+    def base_write_to_csv_yaml_test(self, temp, dtypes, length, skip_header=False):
         """
         base test for write csv yaml
         """
         df = self.make_test_dfs([dtypes], length)
 
-        csv = self.write_dfs(temp, df, [dtypes], write_header)
+        csv = self.write_dfs(temp, df, [dtypes], skip_header)
 
         filename = csv[0]
 
@@ -430,7 +430,7 @@ class TestWriteDataFrameToCsvAndYaml(helpers.WriteHelpers):
         assert not os.path.exists(yaml_filename)
 
         api.write_dataframe_to_csv_and_yaml(df[0], filename, dtypes,
-                                            write_header=write_header)
+                                            skip_header=skip_header)
 
         return df[0], filename, yaml_filename
 
@@ -438,29 +438,33 @@ class TestWriteDataFrameToCsvAndYaml(helpers.WriteHelpers):
         """
         basic sanity check - write normal df
         """
-        write_header = True
+        skip_header = False
         dtypes = {v: "int" for v in "ABC"}
-        df, filename, yaml_filename = self.base_write_to_csv_yaml_test(tmpdir,
-                                                                       dtypes,
-                                                                       n_rows,
-                                                                       write_header=write_header)
+        df, filename, yaml_filename = self.base_write_to_csv_yaml_test(
+            tmpdir,
+            dtypes,
+            n_rows,
+            skip_header=skip_header
+        )
 
         self.validate_write_to_csv_yaml_test(df, dtypes, filename, yaml_filename,
-                                             wrote_header=write_header)
+                                             skipped_header=skip_header)
 
     def test_write_to_csv_yaml_no_header(self, tmpdir, n_rows):
         """
         write single df without header
         """
-        write_header = False
+        skip_header = False
         dtypes = {v: "int" for v in "ABC"}
-        df, filename, yaml_filename = self.base_write_to_csv_yaml_test(tmpdir,
-                                                                       dtypes,
-                                                                       n_rows,
-                                                                       write_header=write_header)
+        df, filename, yaml_filename = self.base_write_to_csv_yaml_test(
+            tmpdir,
+            dtypes,
+            n_rows,
+            skip_header=skip_header)
 
-        self.validate_write_to_csv_yaml_test(df, dtypes, filename, yaml_filename,
-                                             wrote_header=write_header)
+        self.validate_write_to_csv_yaml_test(
+            df, dtypes, filename, yaml_filename,
+            skipped_header=skip_header)
 
     def test_write_to_csv_yaml_empty(self, tmpdir):
         """
@@ -782,7 +786,7 @@ class TestMergeCsv(helpers.MergeHelpers):
         dfs, csvs, ref = self.base_merge_test(n_rows, how, on, suffs,
                                               [dtypes1, dtypes2],
                                               write=True, dir=tmpdir,
-                                              write_head=False)
+                                              skip_header=True)
 
         api.merge_csv(csvs, merged, how=how, on=on)
 
