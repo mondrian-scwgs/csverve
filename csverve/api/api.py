@@ -10,6 +10,7 @@ from csverve.core import IrregularCsverveInput
 from csverve.errors import CsverveConcatException
 from csverve.utils import concatenate_csv_files_quick_lowmem, concatenate_csv_files_pandas
 
+from warnings import warn
 
 def get_columns(infile):
     return CsverveInput(infile).columns
@@ -36,7 +37,7 @@ def rewrite_csv_file(
     @return:
     """
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     if os.path.exists(filepath + '.yaml'):
         csvinput: Union[CsverveInput, IrregularCsverveInput] = CsverveInput(filepath)
@@ -77,7 +78,7 @@ def merge_csv(
     @return:
     """
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     if isinstance(in_filenames, dict):
         in_filenames = list(in_filenames.values())
@@ -109,7 +110,7 @@ def concatenate_csv(inputfiles: List[str], output: str, skip_header: bool = True
     @return:
     """
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     if isinstance(inputfiles, dict):
         inputfiles = list(inputfiles.values())
@@ -163,7 +164,7 @@ def annotate_csv(
     """
 
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     csvinput = CsverveInput(infile)
     metrics_df = csvinput.read_csv()
@@ -213,7 +214,7 @@ def simple_annotate_csv(
     @return:
     """
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     csvinput = CsverveInput(in_f)
     metrics_df = csvinput.read_csv()
@@ -247,7 +248,7 @@ def add_col_from_dict(
     """
 
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     csvinput = CsverveInput(infile)
     csv_dtypes = csvinput.dtypes
@@ -281,7 +282,7 @@ def write_dataframe_to_csv_and_yaml(
     """
 
     if kwargs.get('write_header') is not None:
-        raise DeprecationWarning('write_header has been deprecated and will be ignored, please use skip_header instead')
+        warn('write_header has been deprecated and will be ignored, please use skip_header instead', DeprecationWarning)
 
     csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
         df, outfile, dtypes, skip_header=skip_header
