@@ -23,7 +23,7 @@ def pandas_to_std_types(dtype: Any) -> str:
         "float": "float",
         "object": "str",
         "str": "str",
-        "category": "str",
+        "category": "category",
     }
 
     if not isinstance(dtype, str):
