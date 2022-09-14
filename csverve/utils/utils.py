@@ -66,7 +66,7 @@ def concatenate_csv_files_pandas(
         in_filenames: Union[List[str], Dict[str, str]],
         out_filename: str,
         dtypes: Dict[str, str],
-        skip_header: bool = True,
+        skip_header: bool = False,
         drop_duplicates: bool = False,
         **kwargs
 ) -> None:
@@ -103,7 +103,7 @@ def concatenate_csv_files_quick_lowmem(
         output: str,
         dtypes: Dict[str, str],
         columns: List[str],
-        skip_header: bool = True,
+        skip_header: bool = False,
         **kwargs
 ) -> None:
     """

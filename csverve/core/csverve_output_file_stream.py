@@ -12,7 +12,7 @@ class CsverveOutputFileStream(CsverveOutput):
             filepath: str,
             dtypes: Dict[str, str],
             columns: List[str],
-            skip_header: bool = True,
+            skip_header: bool = False,
             na_rep: str = 'NaN',
             sep: str = ',',
     ) -> None:

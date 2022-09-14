@@ -23,7 +23,7 @@ def get_dtypes(infile):
 def rewrite_csv_file(
         filepath: str,
         outputfile: str,
-        skip_header: bool = True,
+        skip_header: bool = False,
         dtypes: Dict[str, str] = None,
         **kwargs
 ) -> None:
@@ -99,7 +99,7 @@ def merge_csv(
     csvoutput.write_df()
 
 
-def concatenate_csv(inputfiles: List[str], output: str, skip_header: bool = True,
+def concatenate_csv(inputfiles: List[str], output: str, skip_header: bool = False,
                     drop_duplicates: bool = False, **kwargs) -> None:
     """
     Concatenate gzipped CSV files, dtypes in meta YAML files must be the same.
