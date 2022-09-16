@@ -1,4 +1,4 @@
-
+# type: ignore
 # Version: 0.16
 
 """The Versioneer - like a rocketeer, but for versions.
