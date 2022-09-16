@@ -2,6 +2,8 @@
 
 """The setup script."""
 
+import versioneer
+
 from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
@@ -20,9 +22,9 @@ requirements = [
     'mypy==0.790',
 ]
 
-setup_requirements = [ ]
+setup_requirements = []
 
-test_requirements = [ ]
+test_requirements = []
 
 setup(
     author="Shah Lab",
@@ -55,6 +57,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/mondrian-scwgs/csverve',
-    version="v0.2.5",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     zip_safe=False,
 )
