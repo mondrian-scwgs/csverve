@@ -7,13 +7,13 @@ from csverve.errors import CsverveWriterError
 
 class CsverveOutputDataFrame(CsverveOutput):
     def __init__(
-        self,
-        df: pd.DataFrame,
-        filepath: str,
-        dtypes: Dict[str, str],
-        write_header: bool = True,
-        na_rep: str = 'NaN',
-        sep: str = ',',
+            self,
+            df: pd.DataFrame,
+            filepath: str,
+            dtypes: Dict[str, str],
+            skip_header: bool = False,
+            na_rep: str = 'NaN',
+            sep: str = ',',
     ) -> None:
         """
         CSV file and all related metadata.
@@ -29,7 +29,7 @@ class CsverveOutputDataFrame(CsverveOutput):
 
         super().__init__(
             filepath, dtypes, columns,
-            write_header=write_header, na_rep=na_rep, sep=sep
+            skip_header=skip_header, na_rep=na_rep, sep=sep
         )
 
         self._cast_df()
@@ -63,7 +63,7 @@ class CsverveOutputDataFrame(CsverveOutput):
                 if i == 0:
                     data.to_csv(
                         self.filepath, sep=self.sep, na_rep=self.na_rep,
-                        index=False, compression='gzip', header=self.write_header, mode='w'
+                        index=False, compression='gzip', header=(not self.skip_header), mode='w'
                     )
                 else:
                     data.to_csv(
@@ -73,7 +73,7 @@ class CsverveOutputDataFrame(CsverveOutput):
         elif isinstance(self.df, pd.DataFrame):
             self.df.to_csv(
                 self.filepath, sep=self.sep, na_rep=self.na_rep,
-                index=False, compression='gzip', header=self.write_header
+                index=False, compression='gzip', header=(not self.skip_header)
             )
         else:
             raise CsverveWriterError('Invalid df provided as input')

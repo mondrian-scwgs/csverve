@@ -11,7 +11,7 @@ from csverve.errors import CsverveParseError
 
 class TestInputs:
 
-    def write_dfs(self, tmpdir, dfs, dtypes, write_heads=True):
+    def write_dfs(self, tmpdir, dfs, dtypes, skip_header=False):
         n_dfs = len(dfs)
         names = [os.path.join(tmpdir, str(i) + ".csv.gz") for i in range(n_dfs)]
 
@@ -19,7 +19,7 @@ class TestInputs:
 
         for i in range(n_dfs):
             api.write_dataframe_to_csv_and_yaml(dfs[i], names[i],
-                                                dtypes[i], write_heads)
+                                                dtypes[i], skip_header)
         return names
 
     def make_test_df(self, dtypes, length):
@@ -127,18 +127,18 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         return annotations
 
     def make_ann_test_inputs(self, temp, length, dtypes, ann_dtypes,
-                             write_header=True, on="cell_id"):
+                             skip_header=False, on="cell_id"):
         """
         make inputs to test annotate_csv
         :param temp: tempdir to test in
         :param length: length of test dfs
         :param dtypes: dtypes of test dfs
         :param ann_dtypes: dtypes of test annotation dict
-        :param write_header: T/F write header post-annotation
+        :param skip_header: T/F write header post-annotation
         :param on: col to annotate on
         """
         df = self.make_test_dfs([dtypes], length)
-        csv = self.write_dfs(temp, df, [dtypes], write_header)
+        csv = self.write_dfs(temp, df, [dtypes], skip_header)
 
         df = df[0]
         csv = csv[0]
@@ -147,7 +147,7 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
 
         return csv, annotation_input
 
-    def base_annotation_test(self, temp, length, dtypes, ann_dtypes, head=True,
+    def base_annotation_test(self, temp, length, dtypes, ann_dtypes, skip_header=False,
                              on="cell_id"):
         """
         base test of annotate_csv
@@ -155,19 +155,19 @@ class AnnotationHelpers(TestInputs, TestValidationHelpers):
         :param length: length of test dfs
         :param dtypes: dtypes of test dfs
         :param ann_dtypes: dtypes of test annotation dict
-        :param write_header: T/F write header post-annotation
+        :param skip_header: T/F write header post-annotation
         :param on: col to annotate on:
         """
 
         csv, annotation = self.make_ann_test_inputs(temp, length,
                                                     dtypes, ann_dtypes,
-                                                    write_header=head,
+                                                    skip_header=skip_header,
                                                     on=on)
 
         annotated = os.path.join(temp, "annotated.csv.gz")
 
         api.annotate_csv(csv, annotation, annotated, ann_dtypes,
-                         write_header=head, on=on)
+                         skip_header=skip_header, on=on)
 
         return csv, annotation, annotated
 
@@ -195,7 +195,7 @@ class ConcatHelpers(TestInputs, TestValidationHelpers):
     """
 
     def base_test_concat(self, length, dtypes, write=False, dir=None,
-                         get_ref=False, write_head=True):
+                         get_ref=False, skip_header=False):
         """
         base concatenation test; make dfs, write them,
         get a "reference" concat output
@@ -205,7 +205,7 @@ class ConcatHelpers(TestInputs, TestValidationHelpers):
         :param dir: directory to write to if writing
         :param get_ref: T/F: get excpected output from concatenation using
         pandas built-ins
-        :param write_head: T/F: write header when writing out to csvs
+        :param skip_header: T/F: write header when writing out to csvs
         :return: dfs and or csvs and or expected output
         """
 
@@ -214,7 +214,7 @@ class ConcatHelpers(TestInputs, TestValidationHelpers):
         outs = [dfs]
 
         if write:
-            csvs = self.write_dfs(dir, dfs, dtypes, write_head)
+            csvs = self.write_dfs(dir, dfs, dtypes, skip_header)
             outs.append(csvs)
 
         if get_ref:
@@ -229,13 +229,13 @@ class WriteHelpers(TestInputs, TestValidationHelpers):
     helpers class for testing of csverve writing
     """
 
-    def write_file_successful(self, df, csv, wrote_header=True):
+    def write_file_successful(self, df, csv, skipped_header=False):
         head = "infer"
-        if not wrote_header:
+        if skipped_header:
             head = None
         csv = pd.read_csv(csv, sep=",", header=head)
 
-        if not wrote_header:
+        if skipped_header:
             csv.columns = df.columns
 
         if not df.equals(csv):
@@ -290,7 +290,7 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
         return dfs
 
     def base_merge_test(self, length, how, on, suffixes, dtypes, write=False,
-                        get_ref=True, dir=None, write_head=True):
+                        get_ref=True, dir=None, skip_header=False):
         """
         base test for all merge fnctions
         :param length: length of test dfs
@@ -301,7 +301,7 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
         :param write: T/F write out test dfs before merging
         :param get_ref: get expected merge output
         :param dir: temp dir to test in
-        :param write_head: T/F write header to csv (before and after testing)
+        :param skip_header: T/F write header to csv (before and after testing)
         """
 
         dfs = self.make_mergeable_test_dfs(dtypes, on, length)
@@ -311,7 +311,7 @@ class MergeHelpers(TestInputs, TestValidationHelpers):
             return dfs
 
         if write:
-            csvs = self.write_dfs(dir, dfs, dtypes, write_head)
+            csvs = self.write_dfs(dir, dfs, dtypes, skip_header)
             outs.append(csvs)
 
         if get_ref:

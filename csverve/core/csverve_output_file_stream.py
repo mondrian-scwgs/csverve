@@ -12,7 +12,7 @@ class CsverveOutputFileStream(CsverveOutput):
             filepath: str,
             dtypes: Dict[str, str],
             columns: List[str],
-            write_header: bool = True,
+            skip_header: bool = False,
             na_rep: str = 'NaN',
             sep: str = ',',
     ) -> None:
@@ -28,7 +28,7 @@ class CsverveOutputFileStream(CsverveOutput):
 
         super().__init__(
             filepath, dtypes, columns,
-            write_header=write_header, na_rep=na_rep, sep=sep
+            skip_header=skip_header, na_rep=na_rep, sep=sep
         )
 
     def _write_header_to_file(self, writer: TextIO) -> None:
@@ -52,7 +52,7 @@ class CsverveOutputFileStream(CsverveOutput):
         assert self.dtypes
         with gzip.open(self.filepath, 'wt') as writer:
 
-            if self.write_header:
+            if not self.skip_header:
                 self._write_header_to_file(writer)
 
             for csvfile in csvfiles:
