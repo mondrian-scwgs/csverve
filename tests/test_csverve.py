@@ -14,6 +14,8 @@ import pandas as pd
 import pytest
 from click.testing import CliRunner
 from csverve import cli
+from csverve.api.api import concatenate_csv_files_pandas
+from csverve.api.api import concatenate_csv_files_quick_lowmem
 from csverve.core.csverve_input import CsverveInput
 from csverve.errors import CsverveConcatException
 from csverve.errors import CsverveMergeCommonColException
@@ -340,7 +342,7 @@ class TestConcatCsvFilesPandas(helpers.ConcatHelpers):
                                                write=True, get_ref=True,
                                                dir=tmpdir)
 
-        utils.concatenate_csv_files_pandas(csvs, concatenated, dtypes, True)
+        concatenate_csv_files_pandas(csvs, concatenated, dtypes, True)
 
         assert self.dfs_exact_match(ref, concatenated)
 
@@ -352,7 +354,7 @@ class TestConcatCsvFilesPandas(helpers.ConcatHelpers):
                                                write=True, get_ref=True,
                                                dir=tmpdir, skip_header=True)
 
-        utils.concatenate_csv_files_pandas(csvs, concatenated, dtypes, True)
+        concatenate_csv_files_pandas(csvs, concatenated, dtypes, True)
 
         assert self.dfs_exact_match(ref, concatenated)
 
@@ -373,7 +375,7 @@ class TestConcatCsvFilesQuickLowMem(helpers.ConcatHelpers):
                                                write=True, get_ref=True,
                                                dir=tmpdir, skip_header=True)
 
-        utils.concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
+        concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
 
         assert self.dfs_exact_match(ref, concatenated)
 
@@ -389,7 +391,7 @@ class TestConcatCsvFilesQuickLowMem(helpers.ConcatHelpers):
                                                write=True, get_ref=True,
                                                dir=tmpdir, skip_header=True)
 
-        utils.concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
+        concatenate_csv_files_quick_lowmem(csvs, concatenated, dtypes, list(dtypes.keys()))
 
         assert self.dfs_exact_match(ref, concatenated)
 
