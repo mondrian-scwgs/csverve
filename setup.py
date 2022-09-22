@@ -18,7 +18,7 @@ requirements = [
     'pyyaml',
     'numpy',
     'pytest',
-    'Sphinx==1.8.5',
+    'Sphinx==5.1.1',
     'mypy==0.790',
 ]
 
