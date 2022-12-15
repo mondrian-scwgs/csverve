@@ -59,6 +59,24 @@ def rewrite(
 
 
 @cli.command()
+@click.option('--in_f', required=True, help='CSV file path. Expects YAML w/ the same path as CSV with .yaml extension.')
+@click.option('--out_f', required=True, help='Path of resulting merged CSV.')
+@click.option('--skip_header', is_flag=True, default=False, help='Writer header to resulting CSV.')
+def remove_duplicates(
+        in_f,
+        out_f,
+        skip_header
+):
+    assert os.path.exists(in_f)
+
+    api.remove_duplicates(
+        in_f,
+        out_f,
+        skip_header
+    )
+
+
+@cli.command()
 @click.option('--in_f', multiple=True, required=True, help='CSV file path, allows multiple paths.')
 @click.option('--out_f', required=True, help='Path of resulting merged CSV.')
 @click.option('--skip_header', is_flag=True, default=False, help='Writer header to resulting CSV.')

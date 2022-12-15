@@ -14,3 +14,4 @@ from csverve.api import write_dataframe_to_csv_and_yaml
 from csverve.api import read_csv
 from csverve.api import get_columns
 from csverve.api import get_dtypes
+from csverve.api import remove_duplicates

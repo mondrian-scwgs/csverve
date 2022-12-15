@@ -1,5 +1,6 @@
 import os
 from typing import List, Dict, Union
+from warnings import warn
 
 import csverve.utils as utils
 import pandas as pd  # type: ignore
@@ -8,10 +9,6 @@ from csverve.core import CsverveOutputDataFrame
 from csverve.core import CsverveOutputFileStream
 from csverve.core import IrregularCsverveInput
 from csverve.errors import CsverveConcatException
-
-from warnings import warn
-
-
 
 
 def concatenate_csv_files_pandas(
@@ -369,3 +366,29 @@ def read_csv(infile: str, chunksize: int = None, usecols=None, dtype=None) -> pd
     @return: pandas DataFrame.
     """
     return CsverveInput(infile).read_csv(chunksize=chunksize, usecols=usecols, dtype=dtype)
+
+
+def remove_duplicates(
+        filepath: str, outputfile: str, skip_header: bool = False,
+
+) -> None:
+    """
+    remove duplicate rows
+
+    Assumes a YAML meta file in the same path with the same name, with a .yaml extension.
+    YAML file structure is atop this file.
+
+    @param filepath: Path to CSV file.
+    @param outputfile: Path to CSV file.
+    """
+
+    csvinput = CsverveInput(filepath)
+
+    df = csvinput.read_csv()
+
+    df = df.drop_duplicates(keep='first')
+
+    csvoutput: CsverveOutputDataFrame = CsverveOutputDataFrame(
+        df, outputfile, csvinput.dtypes, skip_header=skip_header
+    )
+    csvoutput.write_df()
