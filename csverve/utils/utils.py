@@ -76,7 +76,7 @@ def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str]) 
     standard = standard.sort_values(on).reset_index(drop=True)
     for frame in frames:
         comp_df = frame[on].sort_values(on).reset_index(drop=True)
-        if not standard.equals(comp_df):
+        if not pd.concat([standard, comp_df]).drop_duplicates(keep=False).empty:
             raise CsverveMergeColumnMismatchException("columns on which to merge must be identical")
 
     # check that columns to be merged have same dtypes
