@@ -106,7 +106,8 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: List[str]) -> pd.Data
     if isinstance(on, str):
         on = [on]
 
-    _validate_merge_cols(frames, on, how)
+    if on == 'outer':
+        _validate_merge_cols(frames, on)
 
     if len(frames) == 1:
         return frames[0]
