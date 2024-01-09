@@ -648,6 +648,21 @@ class TestMergeFrames(helpers.MergeHelpers):
                                           how=how, on=on,
                                           expected_error=CsverveMergeCommonColException)
 
+    def test_merge_frames_outer_differing_vals_on_common_cols(self, n_rows):
+        """
+        test merging of 2 dfs on multiple columns with right merge
+        """
+        how = "outer"
+        on = ["A"]
+        dtypes1 = {v: "float" for v in "AC"}
+        dtypes2 = {v: "float" for v in "ACF"}
+
+        dfs = self.make_mergeable_test_dfs([dtypes1, dtypes2], on, n_rows)
+
+        assert self._raises_correct_error(utils.merge_frames, dfs,
+                                          how=how, on=on,
+                                          expected_error=CsverveMergeCommonColException)
+
     def test_merge_frames_inner_same_vals_on_common_cols(self, n_rows):
         """
         test merging of 2 dfs on multiple columns with right merge
@@ -659,9 +674,26 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         dfs = self.make_mergeable_test_dfs([dtypes1, dtypes2], on, n_rows)
 
-        merged = utils.merge_frames(dfs, how=how, on=on)
+        merged = utils.merge_frames(dfs, how=how, on=on, lenient=True)
 
         ref = dfs[0].merge(dfs[1], how=how, on=on)
+
+        assert self.dfs_exact_match(ref, merged)
+
+    def test_merge_frames_outer_differing_vals_on_common_cols_lenient(self, n_rows):
+        """
+        test merging of 2 dfs on multiple columns with right merge
+        """
+        how = "outer"
+        on = ["A"]
+        dtypes1 = {v: "float" for v in "AC"}
+        dtypes2 = {v: "float" for v in "ACF"}
+
+        dfs = self.make_mergeable_test_dfs([dtypes1, dtypes2], on, n_rows)
+
+        merged = utils.merge_frames(dfs, how=how, on=on, lenient=True)
+
+        ref = dfs[0].merge(dfs[1][['A', 'F']], how=how, on=on)
 
         assert self.dfs_exact_match(ref, merged)
 

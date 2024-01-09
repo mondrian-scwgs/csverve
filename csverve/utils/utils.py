@@ -106,7 +106,7 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: List[str], lenient: b
     if isinstance(on, str):
         on = [on]
 
-    if lenient is True:
+    if lenient is False:
         _validate_merge_cols(frames, on)
 
     if len(frames) == 1:
