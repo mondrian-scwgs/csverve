@@ -59,7 +59,7 @@ def merge_dtypes(dtypes_all: List[Dict[str, str]]) -> Dict[str, str]:
     return merged_dtypes
 
 
-def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str]) -> None:
+def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str], how: str) -> None:
     """
     Make sure frames look good, raise relevant exceptions.
 
@@ -71,13 +71,14 @@ def _validate_merge_cols(frames: List[pd.DataFrame], on: Union[List[str], str]) 
     if not on:
         raise CsverveMergeException("unable to merge if given nothing to merge on")
 
-    # check that columns to be merged have identical values
-    standard = frames[0][on]
-    standard = standard.sort_values(on).reset_index(drop=True)
-    for frame in frames:
-        comp_df = frame[on].sort_values(on).reset_index(drop=True)
-        if not pd.concat([standard, comp_df]).drop_duplicates(keep=False).empty:
-            raise CsverveMergeColumnMismatchException("columns on which to merge must be identical")
+    if how == 'outer':
+        # check that columns to be merged have identical values
+        standard = frames[0][on]
+        standard = standard.sort_values(on).reset_index(drop=True)
+        for frame in frames:
+            comp_df = frame[on].sort_values(on).reset_index(drop=True)
+            if not pd.concat([standard, comp_df]).drop_duplicates(keep=False).empty:
+                raise CsverveMergeColumnMismatchException("columns on which to merge must be identical")
 
     # check that columns to be merged have same dtypes
     for shared_col in on:
@@ -105,7 +106,7 @@ def merge_frames(frames: List[pd.DataFrame], how: str, on: List[str]) -> pd.Data
     if isinstance(on, str):
         on = [on]
 
-    _validate_merge_cols(frames, on)
+    _validate_merge_cols(frames, on, how)
 
     if len(frames) == 1:
         return frames[0]

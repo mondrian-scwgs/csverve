@@ -633,7 +633,7 @@ class TestMergeFrames(helpers.MergeHelpers):
 
         assert self.dfs_exact_match(ref, merged)
 
-    def test_merge_frames_differing_vals_on_common_cols(self, n_rows):
+    def test_merge_frames_inner_differing_vals_on_common_cols(self, n_rows):
         """
         test merging of 2 dfs on multiple columns with right merge
         """
@@ -647,6 +647,23 @@ class TestMergeFrames(helpers.MergeHelpers):
         assert self._raises_correct_error(utils.merge_frames, dfs,
                                           how=how, on=on,
                                           expected_error=CsverveMergeCommonColException)
+
+    def test_merge_frames_inner_same_vals_on_common_cols(self, n_rows):
+        """
+        test merging of 2 dfs on multiple columns with right merge
+        """
+        how = "inner"
+        on = ["A"]
+        dtypes1 = {v: "float" for v in "AD"}
+        dtypes2 = {v: "float" for v in "ACF"}
+
+        dfs = self.make_mergeable_test_dfs([dtypes1, dtypes2], on, n_rows)
+
+        merged = utils.merge_frames(dfs, how=how, on=on)
+
+        ref = dfs[0].merge(dfs[1], how=how, on=on)
+
+        assert self.dfs_exact_match(ref, merged)
 
 
 class TestMergeDtypes(helpers.MergeHelpers):
