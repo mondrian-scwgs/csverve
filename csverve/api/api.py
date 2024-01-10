@@ -127,6 +127,7 @@ def merge_csv(
         how: str,
         on: List[str],
         skip_header: bool = False,
+        lenient: bool = False,
         **kwargs
 ) -> None:
     """
@@ -151,7 +152,7 @@ def merge_csv(
 
     dtypes: List[Dict[str, str]] = [csvinput.dtypes for csvinput in data]
 
-    merged_data: pd.DataFrame = utils.merge_frames(dfs, how, on)
+    merged_data: pd.DataFrame = utils.merge_frames(dfs, how, on, lenient=lenient)
 
     dtypes_: Dict[str, str] = utils.merge_dtypes(dtypes)
 
