@@ -16,10 +16,10 @@ requirements = [
     'click>=7.0',
     'pandas>=1.0.0',
     'pyyaml',
-    'numpy',
+    'numpy<2',
     'pytest',
     'Sphinx==5.1.1',
-    'mypy==0.790',
+    'mypy',
 ]
 
 setup_requirements = []
