@@ -16,9 +16,9 @@ requirements = [
     'click>=7.0',
     'pandas>=1.0.0',
     'pyyaml',
-    'numpy<2',
+    'numpy',
     'pytest',
-    'Sphinx==5.1.1',
+    'Sphinx',
     'mypy',
 ]
 
